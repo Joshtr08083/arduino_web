@@ -1,35 +1,24 @@
-const api_url = "http://192.168.86.23:8081";
+const client = new WebSocket('ws://192.168.86.23:8080');
 
-async function getData() {
-    const query = `${api_url}/data`;
-    try {
-        const response = await fetch(query, {
-            method: 'GET',
-            headers: {
-                'Content-Type' : 'application/json'
-            }
-        });
+let data;
 
-        const data = await response.json();
-        if (data.success) {
-            return data.response;
-        }
-        return null;
+client.onopen = function(event) {
+    // Doesn't actually need real authentication, this will do
+    // Note to self maybe add authentication idk not like it matters
+    client.send("{\"id\":\"a\",\"auth\":\"a\"}");
+};
 
-    } catch (error) {
-        console.error(`${error}`);
-        return null;
-    }
+client.onmessage = async function(event) {
+    const text = await event.data.text();
+    // Receives server data which it (hoepfully) got from esp32
+    data = JSON.parse(text);
+
+    console.log(data);
+    console.log("Temperature: " + (data.Temp * 9/5 + 32) + "°F");
+    console.log("Humidity: " + data.Humid + "%");
+    document.getElementById("DHTTemp").innerHTML = `DHT Temp: ${(data.DHTTemp * 9/5 + 32)}°F`;
+    document.getElementById("Humid").innerHTML = `Humidity: ${data.Humid}%`;
+    document.getElementById("Temp").innerHTML = `Thermistor Temp: ${data.Temp}°F`;
+    document.getElementById("Light").innerHTML = `Light Sensor: ${data.Light}`;
+    document.getElementById("Dist").innerHTML = `Distance Sensor: ${data.Dist}cm`;
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-    while(true) {
-        const data = JSON.parse(await getData());
-        
-        console.log("Temperature: " + (data.Temp * 9/5 + 32) + "°F");
-        console.log("Humidity: " + data.Humid + "%");
-        document.getElementById("Temp").innerHTML = `Temperature: ${(data.Temp * 9/5 + 32)}°F`;
-        document.getElementById("Humid").innerHTML = `Humidity: ${data.Humid}%`;
-        await new Promise(r => setTimeout(r, 3000));
-    }
-});
