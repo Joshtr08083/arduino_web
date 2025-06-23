@@ -6,8 +6,8 @@
 
 body {
     background-color: var(--bgcol, #ff7dda);
-    margin: -40px;
-    top: 0px;
+    margin: 0;
+    top: 0;
 }
 
 h1 {
@@ -15,7 +15,7 @@ h1 {
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
     vertical-align: top;
-    font-size: 400%;
+    font-size: 3vw;
 }
 
 
@@ -29,7 +29,7 @@ h1 {
         "space2 space2";
     background-color: var(--secondary, #ff08f7);
     /* outline: solid green 2px; */
-    margin: 60px;
+    margin: 1vw;
 }
 
 .main > div {
@@ -44,12 +44,12 @@ h1 {
 
 .main > div.space {
     /* background-color: rgb(201, 146, 146); */
-    padding-bottom: 50px;
+    padding-bottom: 5vh;
     grid-area: space;
 }
 
 .main > div.space2 {
-    padding-bottom: 50px;
+    padding-bottom: 10vh;
     grid-area: space2;
 }
 
@@ -57,7 +57,7 @@ h1 {
     /* background-color: rgb(153, 201, 153); */
     grid-area: graph;
     margin: 0 auto;
-    padding: 0 50px;
+    padding: 0 2vw;
 }
 
 .main > div.data {
@@ -70,7 +70,7 @@ h1 {
 .text {
     color: var(--bgcol, #ff08f7);
     font-family: 'Courier New', Courier, monospace;
-    font-size: 200%;
+    font-size: 1.5vw;
     
 }
 
