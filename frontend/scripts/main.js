@@ -1,4 +1,4 @@
-const client = new WebSocket('ws://127.0.0.1/api/ws');
+const client = new WebSocket('ws://127.0.0.1/api/ws', 'echo-protocol');
 
 let data;
 
