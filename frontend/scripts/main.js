@@ -1,7 +1,7 @@
 let server_connected = false;
 let esp32_connected = false;
 
-const client = new WebSocket('ws://frontend:8080');
+const client = new WebSocket('ws://10.0.0.2:8080');
 
 let data;
 
