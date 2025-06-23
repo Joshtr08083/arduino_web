@@ -21,30 +21,142 @@ client.onmessage = async function(event) {
     document.getElementById("dist").innerHTML = `Distance Sensor: ${data.Dist}cm`;
 }
 
-
-const xValues = [50,60,70,80,90,100,110,120,130,140,150];
-const yValues = [7,8,8,9,9,9,10,11,14,14,15];
+const secondValues = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+let tempValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+let lightValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+let distValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 
 const tempChart = new Chart("tempChart", {
     type: "line",
     data: {
-        labels: xValues,
+        labels: secondValues,
         datasets: [{
             backgroundColor:"rgba(29, 27, 38, 0.44)",
-            borderColor: "rgba(0,0,255,0.1)",
-            data: yValues
+            borderColor: "rgba(29, 27, 38, 0.37)",
+            data: tempValues,
+            lineTension: 0.1
         }]
     },
     options: {
         legend: {display: false},
-        scales: {
-          yAxes: [{ticks: {min: 6, max:16}}],
+        title: {
+            display: true,
+            text: 'Thermsistor'
         },
-        plugins: {
-            title: {
+        scales: {
+          yAxes: [{
+            ticks: {min: 70, max:80},
+            scaleLabel: {
                 display: true,
-                text: 'Thermsistor Temp',
+                labelString: 'Temperature (F)'
             }
+          }],
+          xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: "Time Elapsed (s)"
+            }
+          }]
         }
     }
 });
+
+const lightChart = new Chart("lightChart", {
+    type: "line",
+    data: {
+        labels: secondValues,
+        datasets: [{
+            backgroundColor:"rgba(29, 27, 38, 0.44)",
+            borderColor: "rgba(29, 27, 38, 0.37)",
+            data: lightValues,
+            lineTension: 0.1
+        }]
+    },
+    options: {
+        legend: {display: false},
+        title: {
+            display: true,
+            text: 'Photoresistor'
+        },
+        scales: {
+          yAxes: [{
+            ticks: {min: 300, max: 800},
+            scaleLabel: {
+                display: true,
+                labelString: 'Light Value'
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: "Time Elapsed (s)"
+            }
+          }]
+        }
+    }
+});
+
+const distChart = new Chart("distChart", {
+    type: "line",
+    data: {
+        labels: secondValues,
+        datasets: [{
+            backgroundColor:"rgba(29, 27, 38, 0.44)",
+            borderColor: "rgba(29, 27, 38, 0.37)",
+            data: distValues,
+            lineTension: 0.1
+        }]
+    },
+    options: {
+        legend: {display: false},
+        title: {
+            display: true,
+            text: 'Ultrasonic Sensor'
+        },
+        scales: {
+          yAxes: [{
+            ticks: {min: 0, max:70},
+            scaleLabel: {
+                display: true,
+                labelString: 'Distance (cm)'
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: "Time Elapsed (s)"
+            }
+          }]
+        }
+    }
+});
+
+const interval = setInterval(() => {
+    // Temp chart update
+    tempValues.push(data.Temp);
+    tempValues.shift();
+    tempChart.data.datasets[0].data = tempValues;
+    tempChart.update();
+
+    // Light chart update
+    lightValues.push(data.Light);
+    lightValues.shift();
+    lightChart.data.datasets[0].data = lightValues;
+    lightChart.update();
+
+    if (data.Dist > 70) {
+        // Dist chart update
+        distValues.push(null);
+        distValues.shift();
+        distChart.data.datasets[0].data = distValues;
+        distChart.update();
+    } else {
+        // Dist chart update
+        distValues.push(data.Dist);
+        distValues.shift();
+        distChart.data.datasets[0].data = distValues;
+        distChart.update();
+    }
+
+
+}, 1000);

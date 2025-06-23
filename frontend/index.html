@@ -12,8 +12,8 @@
             <h1>DASHBOARD</h1>
         </div>
         <div class="space"></div>
-        <div class="graph">
-            <canvas id="tempChart" style="min-width:50vw; max-width: 50vw;"></canvas> 
+        <div class="tempGraph">
+            <canvas id="tempChart" style="max-width: 50vw; min-width: 50vw"></canvas> 
         </div>
         <div class="data">
             <p class="text" id="DHTTemp">DATA</p>
@@ -23,6 +23,12 @@
             <p class="text" id="dist">DATA</p>
         </div>
         <div class="space2"></div>
+        <div class="lightAndDist">
+            <canvas id="lightChart" style="max-width: 40%; min-width: 40%;"></canvas> 
+
+            <canvas id="distChart" style="max-width: 40%; min-width: 40%;"></canvas> 
+        </div>
+        <div class="space3"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>

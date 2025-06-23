@@ -25,8 +25,10 @@ h1 {
     grid-template-areas:
         "header header"
         "space space"
-        "graph data"
-        "space2 space2";
+        "tempGraph data"
+        "space2 space2"
+        "lightAndDist lightAndDist"
+        "space3 space3";
     background-color: var(--secondary, #ff08f7);
     /* outline: solid green 2px; */
     margin: 1vw;
@@ -53,9 +55,14 @@ h1 {
     grid-area: space2;
 }
 
-.main > div.graph {
+.main > div.space3 {
+    padding-bottom: 10vh;
+    grid-area: space3;
+}
+
+.main > div.tempGraph {
     /* background-color: rgb(153, 201, 153); */
-    grid-area: graph;
+    grid-area: tempGraph;
     margin: 0 auto;
     padding: 0 2vw;
 }
@@ -66,6 +73,18 @@ h1 {
     grid-area: data;
     margin: auto auto;
 }
+
+.main > div.lightAndDist {
+    /* background-color: rgb(153, 201, 153); */
+    grid-area: lightAndDist;
+    margin: 0 0;
+    flex-direction: row;
+    display: flex;
+    gap: 10vw;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .text {
     color: var(--bgcol, #ff08f7);
