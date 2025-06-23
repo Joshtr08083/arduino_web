@@ -61,10 +61,10 @@ wss.on('connection', function connection(ws) {
 setInterval(() => {
     const frontends = clients.get('FRONTEND');
     // Checks if ESP32 is available
-    if (!clients.get("ESP32")) {
-        msg = "{\"esp32fail\":true}";
-    } else {
+    if (clients.get("ESP32").readyState === WebSocket.OPEN) {
         msg = data;
+    } else {
+        msg = "{\"esp32fail\":true}";
     }
     // Sends to all frontends
     for (const client of frontends) {
