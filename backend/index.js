@@ -11,8 +11,11 @@ const clients = new Map();
 // Add set for frontend objects
 clients.set('FRONTEND', new Set());
 
+let lastMessageTime = Date.now();
+
 wss.on('connection', function connection(ws) {
     ws.clientID = null;
+
     console.log('Client connected');
 
     ws.on('message', function incoming(message) {
@@ -24,6 +27,7 @@ wss.on('connection', function connection(ws) {
                     clients.set("ESP32", ws);
                     ws.clientID = "ESP32";
                     console.log("Connected ESP32");
+                    
                 } else {
                     console.log("Failed authentication as ESP32 (could be intentional or unintentional). Sent token: " + parse.auth)
                     clients.get('FRONTEND').add(ws);
@@ -32,6 +36,8 @@ wss.on('connection', function connection(ws) {
                 }
             // Otherwise verify if its data from esp32
             } else if (ws.clientID == "ESP32") {
+                lastMessageTime = Date.now();
+
                 data = message;
                 console.log(`Received <-- ${data}`);
             }
@@ -50,22 +56,26 @@ wss.on('connection', function connection(ws) {
                 console.log("Frontend disconnected");
             }
         } else if (ws.clientID == 'ESP32') {
+            esp32Fails = 0;
             clients.delete("ESP32");
             console.log("ESP32 disconnected");
         }
 
     });
-});
 
+
+});
 
 setInterval(() => {
     const frontends = clients.get('FRONTEND');
+
+    const esp32 = clients.get("ESP32");
     // Checks if ESP32 is available
-    const esp32 = clients.get("ESP32")
-    if (esp32 && esp32.readyState === WebSocket.OPEN) {
-        msg = data;
+    if (!esp32 || Date.now()-lastMessageTime > 10000) {
+        // any message i sent threw an error for some reason, so for now i just send whatever
+        msg = ":("
     } else {
-        msg = "{\"esp32fail\":true}";
+        msg = data;
     }
     // Sends to all frontends
     for (const client of frontends) {
@@ -75,3 +85,5 @@ setInterval(() => {
         }
     }   
 }, 500);
+
+

@@ -1,7 +1,7 @@
 let server_connected = false;
 let esp32_connected = false;
 
-const client = new WebSocket('ws://10.0.0.2:8080');
+const client = new WebSocket('ws://127.0.0.1:8080');
 
 let data;
 
@@ -19,17 +19,18 @@ client.onclose = function(event) {
 
 
 client.onmessage = async function(event) {
-    const text = await event.data.text();
-    // Receives server data which it (hoepfully) got from esp32
-    data = JSON.parse(text);
-
-    if (data.esp32fail) {
-        esp32_connected = false;
-        return;
-    } else if (!esp32_connected) {
+    try {
+        const text = await event.data.text();
+        data = JSON.parse(text);
         esp32_connected = true;
+    } catch (error) {
+        esp32_connected = false;
     }
+    
 
+    // Receives server data which it (hoepfully) got from esp32
+    
+    
     //console.log(data);
     document.getElementById("DHTTemp").innerHTML = `DHT Temp: ${(data.DHTTemp * 9/5 + 32)}°F`;
     document.getElementById("humid").innerHTML = `Humidity: ${data.Humid}%`;
@@ -64,7 +65,7 @@ const tempChart = new Chart("tempChart", {
         },
         scales: {
           yAxes: [{
-            ticks: {min: 70, max:80},
+            ticks: {min: 70, max: 90},
             scaleLabel: {
                 display: true,
                 labelString: 'Temperature (F)'
