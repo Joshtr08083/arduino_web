@@ -21,14 +21,13 @@ h1 {
 
 .main {
     display: grid;
-    grid-template-columns: 1ft 3fr;
+    grid-template-columns: 1fr 3fr;
     grid-template-areas:
         "header header"
         "space space"
-        "graph data";
-    gap: 5px;
+        "graph data"
+        "space2 space2";
     background-color: var(--secondary, #ff08f7);
-    padding: 5px;
     /* outline: solid green 2px; */
     margin: 60px;
 }
@@ -49,22 +48,29 @@ h1 {
     grid-area: space;
 }
 
+.main > div.space2 {
+    padding-bottom: 50px;
+    grid-area: space2;
+}
+
 .main > div.graph {
     /* background-color: rgb(153, 201, 153); */
     grid-area: graph;
-    
+    margin: 0 50px;
+    align-items: center;
 }
 
 .main > div.data {
     /* background-color: rgb(219, 219, 165); */
     text-align: center;
     grid-area: data;
+    margin: auto auto;
 }
 
 .text {
     color: var(--bgcol, #ff08f7);
     font-family: 'Courier New', Courier, monospace;
-    font-size: 150%;
+    font-size: 200%;
     
 }
 
