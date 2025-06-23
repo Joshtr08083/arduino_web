@@ -32,6 +32,7 @@ h1 {
     background-color: var(--secondary, #ff08f7);
     /* outline: solid green 2px; */
     margin: 1vw;
+    filter: blur(1.5rem);
 }
 
 .main > div {
@@ -93,4 +94,18 @@ h1 {
     
 }
 
+#alert {
+    background-color: rgba(127, 0, 0, 0.528);
+        
+    position: fixed;
+    min-width: 50vw;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    min-height: 60vh;
+    transform: translate(-50%, -50%);
+    border-radius: 2rem;
+    box-shadow: 1vw 1vw 1vw #00000078;
+    visibility: hidden;
+}
 

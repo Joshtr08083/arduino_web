@@ -7,7 +7,7 @@
     <title>Dashboard</title>
 </head>
 <body>
-    <div class="main">
+    <div class="main" id="main">
         <div class="header">
             <h1>DASHBOARD</h1>
         </div>
@@ -29,6 +29,11 @@
             <canvas id="distChart" style="max-width: 40%; min-width: 40%;"></canvas> 
         </div>
         <div class="space3"></div>
+    </div>
+    <div id="alert">
+        <h1 style="color: white">UH OH</h1>
+        <br>
+        <p class="text" id="errorMsg" style="color: white">Page content not loading</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>

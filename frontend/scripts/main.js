@@ -1,17 +1,34 @@
+let server_connected = false;
+let esp32_connected = false;
+
 const client = new WebSocket('ws://10.0.0.2:8080');
 
 let data;
 
 client.onopen = function(event) {
+    server_connected = true;
+    data_available = true;
     // Doesn't actually need real authentication, this will do
     // Note to self maybe add authentication idk not like it matters
     client.send("{\"id\":\"a\",\"auth\":\"a\"}");
 };
 
+client.onclose = function(event) {
+    server_connected = false;
+}
+
+
 client.onmessage = async function(event) {
     const text = await event.data.text();
     // Receives server data which it (hoepfully) got from esp32
     data = JSON.parse(text);
+
+    if (data.esp32fail) {
+        esp32_connected = false;
+        return;
+    } else if (!esp32_connected) {
+        esp32_connected = true;
+    }
 
     //console.log(data);
     document.getElementById("DHTTemp").innerHTML = `DHT Temp: ${(data.DHTTemp * 9/5 + 32)}°F`;
@@ -20,6 +37,8 @@ client.onmessage = async function(event) {
     document.getElementById("light").innerHTML = `Light Sensor: ${data.Light}`;
     document.getElementById("dist").innerHTML = `Distance Sensor: ${data.Dist}cm`;
 }
+
+
 
 const secondValues = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 let tempValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
@@ -132,6 +151,16 @@ const distChart = new Chart("distChart", {
 });
 
 const interval = setInterval(() => {
+    if (!server_connected || !esp32_connected) {
+        document.getElementById("main").style.filter = "blur(1.5rem)";
+        document.getElementById("alert").style.visibility = "visible";
+
+        document.getElementById("errorMsg").innerHTML = (!server_connected) ? "Unable to connect to server<br><br>Ensure server is up and refresh" : "ESP32 not responding";
+        
+    } else {
+        document.getElementById("main").style.filter = "blur(0)";
+        document.getElementById("alert").style.visibility = "hidden";
+    }
     // Temp chart update
     tempValues.push(data.Temp);
     tempValues.shift();
