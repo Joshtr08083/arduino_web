@@ -50,6 +50,7 @@ wss.on('connection', function connection(ws) {
                 console.log("Frontend disconnected");
             }
         } else if (ws.clientID == 'ESP32') {
+            clients.delete("ESP32");
             console.log("ESP32 disconnected");
         }
 
