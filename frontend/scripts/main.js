@@ -1,4 +1,4 @@
-const client = new WebSocket('ws://127.0.0.1:8080');
+const client = new WebSocket('ws://10.0.0.2:8080');
 
 let data;
 
