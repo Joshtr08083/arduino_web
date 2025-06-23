@@ -144,7 +144,7 @@ const interval = setInterval(() => {
     lightChart.data.datasets[0].data = lightValues;
     lightChart.update();
 
-    if (data.Dist > 70) {
+    if (data.Dist > 200) {
         // Dist chart update
         distValues.push(null);
         distValues.shift();
