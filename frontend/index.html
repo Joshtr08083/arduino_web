@@ -7,34 +7,26 @@
     <title>Dashboard</title>
 </head>
 <body>
+    <div class="main">
+        <div class="header">
+            <h1>DASHBOARD</h1>
+        </div>
+        <div class="space"></div>
+        <div class="graph">
+            <canvas id="tempChart" style="max-width:700px; margin: 0 auto;"></canvas> 
+        </div>
+        <div class="data">
+            <p class="text" id="DHTTemp">DATA</p>
+            <p class="text" id="humid">DATA</p>
+            <p class="text" id="temp">DATA</p>
+            <p class="text" id="light">DATA</p>
+            <p class="text" id="dist">DATA</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
     <script src="/scripts/main.js"></script>
-    
-    <div class="header">
-        <h1> DASHBOARD </h1> 
-    </div>
 
-    <div class="main">
-        <div class="textBox">
-
-        </div>
-        <div style="padding-bottom: 30vh"></div>
-        <div class="dataDiv">
-            <p class="text" id="DHTTemp">DATA</p>
-        </div> 
-        <div class="dataDiv">
-            <p class="text" id="Humid">DATA</p>
-        </div> 
-        <div class="dataDiv">
-            <p class="text" id="Temp">DATA</p>
-        </div> 
-        <div class="dataDiv">
-            <p class="text" id="Light">DATA</p>
-        </div> 
-        <div class="dataDiv">
-            <p class="text" id="Dist">DATA</p>
-        </div> 
-
-    </div>
 </body>
 </html>

@@ -2,7 +2,7 @@ require('dotenv').config();
 const WebSocket = require('ws');
 
 // Create websocket connection to esp32
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: SERVER_PORT});
 
 // Gets messages
 let data = "{}";
@@ -51,4 +51,4 @@ setInterval(() => {
         client.send(data);
 
     }
-}, 1000);
+}, 500);

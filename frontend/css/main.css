@@ -15,49 +15,57 @@ h1 {
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
     vertical-align: top;
-    font-size: 3em;
-}
-
-.header {
-    outline: var(--secondary, #f34fff) solid 10px;
-    background-color: var(--secondary, #e95cff);
-    margin: 0px;
-    top: 0px;
-    padding-top: 2vh;
-
+    font-size: 400%;
 }
 
 
 .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding-bottom: 22%;
+    display: grid;
+    grid-template-columns: 1ft 3fr;
+    grid-template-areas:
+        "header header"
+        "space space"
+        "graph data";
+    gap: 5px;
+    background-color: var(--secondary, #ff08f7);
+    padding: 5px;
+    /* outline: solid green 2px; */
+    margin: 60px;
+}
 
+.main > div {
+    /* outline: solid red 2px; */
+    background-color: var(--secondary, #ff08f7);
+}
+
+.main > div.header {
+    text-align: center;
+    grid-area: header;
+}
+
+.main > div.space {
+    /* background-color: rgb(201, 146, 146); */
+    padding-bottom: 50px;
+    grid-area: space;
+}
+
+.main > div.graph {
+    /* background-color: rgb(153, 201, 153); */
+    grid-area: graph;
+    
+}
+
+.main > div.data {
+    /* background-color: rgb(219, 219, 165); */
+    text-align: center;
+    grid-area: data;
 }
 
 .text {
     color: var(--bgcol, #ff08f7);
     font-family: 'Courier New', Courier, monospace;
-    font-size: 3em;
+    font-size: 150%;
     
-}
-
-.dataDiv {
-    /* outline: #5cff82 solid 1px; */
-    position: relative;
-    width: 50%;
-    text-align: center;
-}
-
-.textBox {
-    position: absolute;
-    background-color: var(--secondary, #f34fff);
-    top: 15vh;
-    width: 95%;
-    padding-bottom: 205%;
-    border-radius: 15px;
 }
 
 
