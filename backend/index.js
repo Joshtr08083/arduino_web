@@ -2,7 +2,7 @@ require('dotenv').config();
 const WebSocket = require('ws');
 
 // Create websocket connection to esp32
-const wss = new WebSocket.Server({ port: SERVER_PORT});
+const wss = new WebSocket.Server({ port: 8080});
 
 // Gets messages
 let data = "{}";
