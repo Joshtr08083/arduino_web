@@ -3,7 +3,7 @@ import { getSeconds } from "./api.js"
 let server_connected = false;
 let esp32_connected = false;
 
-const client = new WebSocket('ws://192.168.86.23:8080');
+const client = new WebSocket('ws://10.0.0.2:8080');
 
 let data;
 

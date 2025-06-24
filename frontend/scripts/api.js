@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8082"
+const API_URL = "http://10.0.0.2:8082"
 export async function getSeconds() {
     const query = `${API_URL}/seconds-graph`;
     try {
