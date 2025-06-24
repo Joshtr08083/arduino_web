@@ -1,18 +1,28 @@
 require('dotenv').config();
-const WebSocket = require('ws');
 
-// Create websocket connection to esp32
-const wss = new WebSocket.Server({ port: 8080});
+// Express api stuff for seconding data to frontend
+require('./src/api.js');
 
-// Gets messages
-let data = "{}";
+// connect to database
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database("./data/json_log.db", sqlite3.OPEN_READWRITE);
+// add write to database function
+const sql = require('./src/sql.js');
+
+// data stores message
+let data;
 // Create map for differenct frontend/esp32 clients
 const clients = new Map();
 // Add set for frontend objects
 clients.set('FRONTEND', new Set());
-
+// Record last message to detect if esp32 goes offline
 let lastMessageTime = Date.now();
 
+// Create websocket connection
+const WebSocket = require('ws');
+// Create websocket connection to esp32
+const wss = new WebSocket.Server({ port: 8080});
+// Websocket connection manager
 wss.on('connection', function connection(ws) {
     ws.clientID = null;
 
@@ -37,12 +47,13 @@ wss.on('connection', function connection(ws) {
             // Otherwise verify if its data from esp32
             } else if (ws.clientID == "ESP32") {
                 lastMessageTime = Date.now();
-
+                
                 data = message;
                 console.log(`Received <-- ${data}`);
+                
             }
         } catch (e) {
-            console.log("Error: " + e);
+            console.error("Error: " + e);
         }
 
     });
@@ -66,6 +77,8 @@ wss.on('connection', function connection(ws) {
 
 });
 
+
+// Interval stuff
 setInterval(() => {
     const frontends = clients.get('FRONTEND');
 
@@ -85,5 +98,13 @@ setInterval(() => {
         }
     }   
 }, 500);
+
+setInterval(async () => {
+    // Writes data to seconds table
+    if (data) {
+        await sql.write_json(db, 'seconds', JSON.stringify(data));
+        console.log("Saved    --| " + data);
+    }
+}, 1000);
 
 

@@ -15,7 +15,7 @@ h1 {
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
     vertical-align: top;
-    font-size: 3vw;
+    font-size: 4vw;
 }
 
 
@@ -32,7 +32,7 @@ h1 {
     background-color: var(--secondary, #ff08f7);
     /* outline: solid green 2px; */
     margin: 1vw;
-    filter: blur(1.5rem);
+    filter: blur(0rem);
 }
 
 .main > div {
