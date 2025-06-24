@@ -33,11 +33,16 @@ client.onmessage = async function(event) {
     
     
     //console.log(data);
-    document.getElementById("DHTTemp").innerHTML = `DHT Temp: ${(data.DHTTemp * 9/5 + 32)}°F`;
-    document.getElementById("humid").innerHTML = `Humidity: ${data.Humid}%`;
-    document.getElementById("temp").innerHTML = `Thermistor Temp: ${data.Temp}°F`;
-    document.getElementById("light").innerHTML = `Light Sensor: ${data.Light}`;
-    document.getElementById("dist").innerHTML = `Distance Sensor: ${data.Dist}cm`;
+    try {
+        document.getElementById("DHTTemp").innerHTML = `DHT Temp: ${(data.DHTTemp * 9/5 + 32)}°F`;
+        document.getElementById("humid").innerHTML = `Humidity: ${data.Humid}%`;
+        document.getElementById("temp").innerHTML = `Thermistor Temp: ${data.Temp}°F`;
+        document.getElementById("light").innerHTML = `Light Sensor: ${data.Light}`;
+        document.getElementById("dist").innerHTML = `Distance Sensor: ${data.Dist}cm`;
+    } catch (error) {
+        console.error("Sensor error: ", error);
+    }
+
 }
 
 
@@ -51,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     // Attempts get request five times
     // If all tries fail it throws error
+    console.log("GET request to server for seconds graph")
     for (let i = 0; i < 5; i++) {
         const secondsDataArray = await getSeconds();
         if (secondsDataArray) {
@@ -62,8 +68,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             break;
         }
         else if (i == 4) {
+            
             server_connected = false;
+            break;
         }
+        console.log("Failed to connect, retrying...");
     }
     
 
