@@ -8,7 +8,9 @@ export async function getSeconds() {
 
         const data = await response.json();
 
-        return data;
+        if (data)  return data;
+        else return null;
+        
     } catch (error) {
 
         console.error(error);

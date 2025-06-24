@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     console.log("GET request to server for seconds graph")
     for (let i = 0; i < 5; i++) {
         const secondsDataArray = await getSeconds();
-        if (secondsDataArray) {
+        if (secondsDataArray != null) {
             for (let i = 0; i < 15; i++) {
                 tempValues[i] = secondsDataArray[i].data.Temp;
                 lightValues[i] = secondsDataArray[i].data.Light;
