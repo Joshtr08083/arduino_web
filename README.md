@@ -1,7 +1,7 @@
 
 # Arduino-Web Project
 
-This is a *very* specific use-case made by a *very* inexperienced developer who may or may not have gotten more-than-hed-like-to-admit advice from ChatGPT.
+This is a *very* specific use-case made by a *very* inexperienced developer.
 
 ## **What is it?**
 This is the web dashboard app for logging and displaying data gathered from an arduino. Right now that data is useless data from sensors lying around. 
