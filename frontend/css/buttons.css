@@ -3,8 +3,8 @@
     height: 1.5vw;
     cursor: pointer;
     background-color: var(--secondary, #ff08f7);
-    outline: solid #000000a9 0.1vw;
-    border-radius: 0.4vw;
+    outline: solid #00000076 0.1vw;
+    border-radius: 0.1vw;
     border-style: none;
     text-align: center;
     font-size: 0.8vw;
@@ -36,7 +36,7 @@
 }
 
 #lightButton {
-    margin-left: 8vw;
+    margin-left: 8.5vw;
 }
 
 #lightButtonText {
@@ -44,9 +44,55 @@
 }
 
 #distButton {
-    margin-left: 47vw;
+    margin-left: 40vw;
 }
 
 #distButtonText {
     margin: 0;
+}
+
+/* General dropdown css*/
+.dropdown {
+    display: inline-block;
+    position: relative;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 6vw;
+    margin-left: 1.75vw;
+    margin-top: 0.2vw;
+    
+    z-index: 1;
+}
+.dropdown-content a {
+    color: rgba(0, 0, 0, 0.628);
+    background-color: var(--secondary, #ff08f7);
+    outline: solid #00000070 0.1vw;
+    padding: 0.5;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    border-radius: 0.2vw;
+    margin-top: 0.2vw;
+    cursor: pointer;
+}
+.dropdown-content a:hover {background-color: #00000054;}
+.show {display:block;}
+
+/* Temp light and dist drop downs */
+#tempDrop {
+    width: 5vw;
+    margin-left: 2vw;
+}
+
+#lightDrop {
+    width: 5vw;
+    margin-left: 2vw;
+}
+
+#distDrop {
+    width: 5vw;
+    
+    margin-left: 2vw;
 }

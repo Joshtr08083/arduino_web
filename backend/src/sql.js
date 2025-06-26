@@ -55,7 +55,7 @@ const fetchAll = async (db, sql) => {
     });
 };
 
-const tables = ["seconds"]
+const tables = ["seconds", "minutes", "hours"]
 
 async function write_json(db, table, json) {
     try {

@@ -13,7 +13,7 @@ Sensord --> ESP32 --> Server --> Web UI
   
 **Sensors**  
 - Doesn't really matter here
-- Right now it uses DHT11, Thermistor, Photo resisto, and Ultrasonic distance sensor.
+- Right now it uses SHT41, LPS22, Photoresistor, and HC-SR04.
 
 
 **ESP32**  

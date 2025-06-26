@@ -62,7 +62,7 @@ wss.on('connection', function connection(ws) {
     ws.on('close', function () {
         if (ws.clientID == 'FRONTEND') {
             const frontends = clients.get('FRONTEND');
-            if (!frontends && frontends.has(ws)) {
+            if (frontends && frontends.has(ws)) {
                 frontends.delete(ws);
                 write_console("Frontend disconnected");
             }
@@ -104,23 +104,49 @@ setInterval(() => {
     }   
 }, 500);
 
+// Save every second
 setInterval(async () => {
     // Writes data to seconds table
-    if (data) {
-        write_console('Saving   --| ' + data);
-        await sql.write_json(db, 'seconds', JSON.stringify(data));
+    const write = data;
+    if (write) {
+        write_console('Saving   --S ' + write);
+        await sql.write_json(db, 'seconds', write);
     }
 }, 1000);
+// Save every minute
+setInterval(async () => {
+    const write = data;
+    // Writes data to seconds table
+    if (write) {
+        write_console('Saving   --M ' + write);
+        await sql.write_json(db, 'minutes', write);
+    }
+}, 60000);
+// Save every hour
+setInterval(async () => {
+    const write = data;
+    // Writes data to seconds table
+    if (write) {
+        write_console('Saving   --H ' + write);
+        await sql.write_json(db, 'hours', write);
+    }
+}, 3600000);
 
 let bufferMsg = "";
 let repeats = 0;
 function write_console(msg) {
-    if (bufferMsg == msg) {
-        repeats++;
-        process.stdout.write(`${msg} x${repeats}\r`);
+
+    if (process.stdout.isTTY) {
+        if (bufferMsg == msg) {
+            repeats++;
+            process.stdout.write(`${msg} x${repeats}\r`);
+        } else {
+            repeats = 0;
+            process.stdout.write(`\n${msg}\r`);
+        }
+        bufferMsg = msg;
     } else {
-        repeats = 0;
-        process.stdout.write(`\n${msg}\r`);
+        console.log(msg);
     }
-    bufferMsg = msg;
+
 }

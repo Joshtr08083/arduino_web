@@ -20,8 +20,26 @@ const main = async () => {
                 data TEXT CHECK (json_valid(data))
             )`
         );
-
         console.log("Created seconds table if not exists");
+
+        await sql.execute (
+            db,
+            `CREATE TABLE IF NOT EXISTS minutes (
+                timestamp DATETIME PRIMARY KEY,
+                data TEXT CHECK (json_valid(data))
+            )`
+        );
+        console.log("Created minutes table if not exists");
+
+        await sql.execute (
+            db,
+            `CREATE TABLE IF NOT EXISTS hours (
+                timestamp DATETIME PRIMARY KEY,
+                data TEXT CHECK (json_valid(data))
+            )`
+        );
+        console.log("Created hours table if not exists");
+        
     } catch (error) {
         console.error(error);
     } finally {

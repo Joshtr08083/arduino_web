@@ -1,6 +1,6 @@
 const API_URL = "http://127.0.0.1:8082/api"
-export async function getSeconds() {
-    const query = `${API_URL}/seconds-graph`;
+export async function getTable(table) {
+    const query = `${API_URL}/${table}-graph`;
     try {
         const response = await fetch(query, {
             method: 'GET'
@@ -9,7 +9,7 @@ export async function getSeconds() {
         const data = await response.json();
 
         if (data.success == true)  {
-            console.log("Received: " + JSON.stringify(data));
+            console.log(`Received (${table}): ` + JSON.stringify(data));
             return data.response;
         }
         else return null;

@@ -19,13 +19,21 @@
                 <button class="button" id="tempButton">
                     <p id="tempButtonText">||</p>
                 </button>
+                <div class="drowndown tempDropdownDiv">
+                    <button class="button" id="tempDrop">Seconds</button>
+                    <div class="dropdown-content temp-cont" id="tempDropdown">
+                        <a id="tempSeconds">Seconds</a>
+                        <a id="tempMinutes">Minutes</a>
+                        <a id="tempHours">Hours</a>
+                    </div>
+                </div>
             </div>
             <canvas id="tempChart" style="max-width: 50vw; min-width: 50vw"></canvas> 
         </div>
         <div class="data">
-            <p class="text" id="DHTTemp">UH OH</p>
+            <p class="text" id="temp">UH OH</p>
             <p class="text" id="humid">YOUR DATA</p>
-            <p class="text" id="temp">ISNT</p>
+            <p class="text" id="press">ISNT</p>
             <p class="text" id="light">LOADING :(</p>
             <p class="text" id="dist">TRY REFRESHING</p>
         </div>
@@ -35,9 +43,25 @@
                 <button class="button" id="lightButton">
                     <p id="lightButtonText">||</p>
                 </button>
+                <div class="drowndown lightDropdownDiv">
+                    <button class="button" id="lightDrop">Seconds</button>
+                    <div class="dropdown-content light-cont" id="lightDropdown">
+                        <a id="lightSeconds">Seconds</a>
+                        <a id="lightMinutes">Minutes</a>
+                        <a id="lightHours">Hours</a>
+                    </div>
+                </div>
                 <button class="button" id="distButton">
                     <p id="distButtonText">||</p>
                 </button>
+                <div class="drowndown distDropdownDiv">
+                    <button class="button" id="distDrop">Seconds</button>
+                    <div class="dropdown-content dist-cont" id="distDropdown">
+                        <a id="distSeconds">Seconds</a>
+                        <a id="distMinutes">Minutes</a>
+                        <a id="distHours">Hours</a>
+                    </div>
+                </div>
             </div>
             <div class="doubleGraph">
                 <canvas id="lightChart" style="max-width: 40%; min-width: 40%;"></canvas> 
@@ -54,7 +78,7 @@
         <p class="text" id="errorMsg" style="color: white">Page content not loading</p>
     </div>
 
-    <script src="/scripts/buttons.js" type="module"></script>
+    <script src="/scripts/dropdowns.js"></script>
     <script src="/scripts/api.js" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
