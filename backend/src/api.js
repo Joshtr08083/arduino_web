@@ -19,10 +19,10 @@ app.get('/api/seconds-graph', async (req, res) => {
 
     try {
         const resData = await sql.fetchAll(db, query);
-        res.status(200).send(resData);
+        res.status(200).send(`{\"success\":true, \"response\":${JSON.stringify(resData)}}`);
 
     } catch (error) {
-        console.error("DB error: ", err);
+        console.error("DB error: ", error);
         res.status(500).send("Internal server error");
     }
 

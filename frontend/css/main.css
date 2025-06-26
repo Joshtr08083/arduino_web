@@ -19,6 +19,14 @@ h1 {
 }
 
 
+.text {
+    color: var(--bgcol, #ff08f7);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5vw;
+    
+}
+
+
 .main {
     display: grid;
     grid-template-columns: 2fr 2fr;
@@ -66,6 +74,8 @@ h1 {
     grid-area: tempGraph;
     margin: 0 auto;
     padding: 0 2vw;
+    display: flex;
+    flex-direction: column;
 }
 
 .main > div.data {
@@ -79,19 +89,15 @@ h1 {
     /* background-color: rgb(153, 201, 153); */
     grid-area: lightAndDist;
     margin: 0 0;
+
+}
+
+.doubleGraph {
     flex-direction: row;
     display: flex;
     gap: 10vw;
     align-items: center;
     justify-content: center;
-}
-
-
-.text {
-    color: var(--bgcol, #ff08f7);
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1.5vw;
-    
 }
 
 #alert {

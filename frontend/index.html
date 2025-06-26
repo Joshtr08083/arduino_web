@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/buttons.css">
     <link rel="icon" type="image/png" href="/assets/favicon.png">
     <title>Dashboard | ESP32/Arduino</title>
 </head>
@@ -14,6 +15,11 @@
         </div>
         <div class="space"></div>
         <div class="tempGraph">
+            <div class="buttonDiv">
+                <button class="button" id="tempButton">
+                    <p id="tempButtonText">||</p>
+                </button>
+            </div>
             <canvas id="tempChart" style="max-width: 50vw; min-width: 50vw"></canvas> 
         </div>
         <div class="data">
@@ -25,9 +31,20 @@
         </div>
         <div class="space2"></div>
         <div class="lightAndDist">
-            <canvas id="lightChart" style="max-width: 40%; min-width: 40%;"></canvas> 
+            <div class="buttonDiv">
+                <button class="button" id="lightButton">
+                    <p id="lightButtonText">||</p>
+                </button>
+                <button class="button" id="distButton">
+                    <p id="distButtonText">||</p>
+                </button>
+            </div>
+            <div class="doubleGraph">
+                <canvas id="lightChart" style="max-width: 40%; min-width: 40%;"></canvas> 
 
-            <canvas id="distChart" style="max-width: 40%; min-width: 40%;"></canvas> 
+                <canvas id="distChart" style="max-width: 40%; min-width: 40%;"></canvas> 
+            </div>
+
         </div>
         <div class="space3"></div>
     </div>
@@ -37,6 +54,7 @@
         <p class="text" id="errorMsg" style="color: white">Page content not loading</p>
     </div>
 
+    <script src="/scripts/buttons.js" type="module"></script>
     <script src="/scripts/api.js" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 

@@ -18,6 +18,7 @@ clients.set('FRONTEND', new Set());
 // Record last message to detect if esp32 goes offline
 let lastMessageTime = Date.now();
 
+
 // Create websocket connection
 const WebSocket = require('ws');
 // Create websocket connection to esp32
@@ -26,7 +27,8 @@ const wss = new WebSocket.Server({ port: 8080});
 wss.on('connection', function connection(ws) {
     ws.clientID = null;
 
-    console.log('Client connected');
+    write_console(`Client connected\nClients connected: \n`);
+    console.table(clients);
 
     ws.on('message', function incoming(message) {
         try {
@@ -36,21 +38,19 @@ wss.on('connection', function connection(ws) {
                 if (parse.id == "ESP32" && parse.auth == process.env.ESP32_TOKEN) {
                     clients.set("ESP32", ws);
                     ws.clientID = "ESP32";
-                    console.log("Connected ESP32");
+                    write_console("Connected ESP32");
                     
                 } else {
-                    console.log("Failed authentication as ESP32 (could be intentional or unintentional). Sent token: " + parse.auth)
+                    write_console("Failed authentication as ESP32 (could be intentional or unintentional). Sent token: " + parse.auth)
                     clients.get('FRONTEND').add(ws);
                     ws.clientID = "FRONTEND";
-                    console.log("Connected Frontend");
+                    write_console("Connected Frontend");
                 }
             // Otherwise verify if its data from esp32
             } else if (ws.clientID == "ESP32") {
                 lastMessageTime = Date.now();
-                
+                write_console('Received <-- ' + message);
                 data = message;
-                console.log(`Received <-- ${data}`);
-                
             }
         } catch (e) {
             console.error("Error: " + e);
@@ -64,12 +64,14 @@ wss.on('connection', function connection(ws) {
             const frontends = clients.get('FRONTEND');
             if (!frontends && frontends.has(ws)) {
                 frontends.delete(ws);
-                console.log("Frontend disconnected");
+                write_console("Frontend disconnected");
             }
         } else if (ws.clientID == 'ESP32') {
             esp32Fails = 0;
             clients.delete("ESP32");
-            console.log("ESP32 disconnected");
+            write_console("ESP32 disconnected");
+        } else {
+            write_console("Unknown client disconnected");
         }
 
     });
@@ -85,15 +87,18 @@ setInterval(() => {
     const esp32 = clients.get("ESP32");
     // Checks if ESP32 is available
     if (!esp32 || Date.now()-lastMessageTime > 10000) {
+        // clears data
+        data = null;
         // any message i sent threw an error for some reason, so for now i just send whatever
-        msg = ":("
+        msg = "no esp :("
     } else {
         msg = data;
     }
     // Sends to all frontends
     for (const client of frontends) {
         if (client && client.readyState === WebSocket.OPEN) {
-            console.log(`Sending  --> ${msg}`);
+            write_console('Sending  --> ' + msg);
+            
             client.send(msg);
         }
     }   
@@ -102,9 +107,20 @@ setInterval(() => {
 setInterval(async () => {
     // Writes data to seconds table
     if (data) {
+        write_console('Saving   --| ' + data);
         await sql.write_json(db, 'seconds', JSON.stringify(data));
-        console.log("Saved    --| " + data);
     }
 }, 1000);
 
-
+let bufferMsg = "";
+let repeats = 0;
+function write_console(msg) {
+    if (bufferMsg == msg) {
+        repeats++;
+        process.stdout.write(`${msg} x${repeats}\r`);
+    } else {
+        repeats = 0;
+        process.stdout.write(`\n${msg}\r`);
+    }
+    bufferMsg = msg;
+}

@@ -1,0 +1,52 @@
+.button {
+    width: 1.5vw;
+    height: 1.5vw;
+    cursor: pointer;
+    background-color: var(--secondary, #ff08f7);
+    outline: solid #000000a9 0.1vw;
+    border-radius: 0.4vw;
+    border-style: none;
+    text-align: center;
+    font-size: 0.8vw;
+    text-decoration: none;
+    color: #0000007c
+    
+}
+
+.buttonDiv {
+    display: flex;
+    flex-direction: row;
+    /* border: solid red 2px; */
+}
+
+.button:hover {
+    background-color: #0000003b;
+}
+
+.button:active {
+    background-color: #00000072;
+}
+
+#tempButton {
+    margin-left: 3vw;
+}
+
+#tempButtonText {
+    margin: 0;
+}
+
+#lightButton {
+    margin-left: 8vw;
+}
+
+#lightButtonText {
+    margin: 0;
+}
+
+#distButton {
+    margin-left: 47vw;
+}
+
+#distButtonText {
+    margin: 0;
+}

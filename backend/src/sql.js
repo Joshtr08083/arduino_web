@@ -46,7 +46,6 @@ const fetchAll = async (db, sql) => {
             }
             
             return {
-                timestamp: row.timestamp,
                 data: data
             };
         });
