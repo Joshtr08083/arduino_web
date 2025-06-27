@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8082/api"
+const API_URL = "http://10.0.0.2/api"
 export async function getTable(table, time) {
     const query = `${API_URL}/graph?time=${time}&table=${table}`;
     try {
