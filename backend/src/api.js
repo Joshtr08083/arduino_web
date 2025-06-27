@@ -15,6 +15,8 @@ app.use((req, res, next) => {
 
 const tables = ['seconds', 'minutes', 'hours']
 
+// getting graph data function
+// maybe check for sql injection vulnerabilties
 app.get('/api/graph', async (req, res) => {
     let query;
     if (tables.includes(req.query.table)) {
