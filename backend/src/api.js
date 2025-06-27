@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 
 
 app.get('/api/seconds-graph', async (req, res) => {
-    const query = `SELECT * FROM seconds WHERE timestamp > DATETIME('now', '-16 seconds')`;
+    const query = `SELECT * FROM seconds WHERE timestamp > DATETIME('now', '${-16 - (req.query.time * 16)} seconds') AND timestamp < DATETIME('now', '${-16 * req.query.time} seconds')`;
 
     try {
         const resData = await sql.fetchAll(db, query);

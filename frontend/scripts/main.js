@@ -11,6 +11,7 @@ let reconnect = setInterval(()=>{}, 99999);
 
 function connect() {
     clearInterval(reconnect);
+    reconnect = null;
 
     client = new WebSocket('ws://127.0.0.1:8080');
     // Websocket client functions
@@ -46,28 +47,32 @@ function connect() {
 connect();
 
 // Setup graph data
-let tempIntervals = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-let tempLight = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-let tempDist = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-let tempValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
-let lightValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
-let distValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+let intervals = {
+    "temp": [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+    "light": [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+    "dist": [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+}
+let graphValues = {
+    "temp": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    "light": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    "dist": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+}
 
 // Fetch data for seconds graphs from server
-async function fetchData(mode, temp, light, dist) {
+async function fetchData(mode, graph, time=0) {
     // Attempts get request five times
     console.log(`GET request to ${mode} graph`)
     for (let i = 0; i < 5; i++) {
         let secondsDataArray;
         switch (mode) {
-            case "sec":
-                secondsDataArray = await getTable('seconds');
+            case "Seconds":
+                secondsDataArray = await getTable('seconds', time);
                 break;
-            case "min":
-                secondsDataArray = await getTable('minutes');
+            case "Minutes":
+                secondsDataArray = await getTable('minutes', time);
                 break;
-            case "hr":
-                secondsDataArray = await getTable('hours');
+            case "Hours":
+                secondsDataArray = await getTable('hours', time);
                 break;
             default:
                 console.error("Unknown table mode");
@@ -76,15 +81,15 @@ async function fetchData(mode, temp, light, dist) {
 
         const dataLength = secondsDataArray.length;
         if (secondsDataArray != null) {
-            if (temp) tempValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
-            if (light) lightValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
-            if (dist) distValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            if (graph === "temp" || graph === "all") graphValues['temp'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            if (graph === "light" || graph === "all") graphValues['light'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            if (graph === "dist" || graph === "all") graphValues['dist'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 
             if (dataLength != 0) {
                 for (let i = 0; i < dataLength; i++) {
-                    if (temp) tempValues[i + (15-dataLength)] = secondsDataArray[i].data.temp;
-                    if (light) lightValues[i + (15-dataLength)] = secondsDataArray[i].data.light;
-                    if (dist) distValues[i + (15-dataLength)] = (secondsDataArray[i].data.dist < 200) ? secondsDataArray[i].data.dist : null;
+                    if (graph === "temp" || graph === "all") graphValues['temp'][i + (15-dataLength)] = secondsDataArray[i].data.temp;
+                    if (graph === "light" || graph === "all") graphValues['light'][i + (15-dataLength)] = secondsDataArray[i].data.light;
+                    if (graph === "dist" || graph === "all") graphValues['dist'][i + (15-dataLength)] = (secondsDataArray[i].data.dist < 200) ? secondsDataArray[i].data.dist : null;
                 }
             }
             break;
@@ -99,16 +104,18 @@ async function fetchData(mode, temp, light, dist) {
 }
 
 // fetch data to load populate charts on load
-await fetchData("sec", true, true, true);
+await fetchData("Seconds", "all");
 
-const tempChart = new Chart("tempChart", {
+const charts = {"temp":null, "light":null, "dist":null};
+
+charts["temp"] = new Chart("tempChart", {
     type: "line",
     data: {
-        labels: tempIntervals,
+        labels: intervals['temp'],
         datasets: [{
             backgroundColor:"rgba(29, 27, 38, 0.44)",
             borderColor: "rgba(29, 27, 38, 0.37)",
-            data: tempValues,
+            data: graphValues['temp'],
             lineTension: 0.1
         }]
     },
@@ -120,7 +127,7 @@ const tempChart = new Chart("tempChart", {
         },
         scales: {
         yAxes: [{
-            ticks: {min: 75, max: 85},
+            ticks: {min: 60, max: 80},
             scaleLabel: {
                 display: true,
                 labelString: 'Temperature (F)'
@@ -135,14 +142,14 @@ const tempChart = new Chart("tempChart", {
         }
     }
 });
-const lightChart = new Chart("lightChart", {
+charts["light"] = new Chart("lightChart", {
     type: "line",
     data: {
-        labels: tempLight,
+        labels: intervals['light'],
         datasets: [{
             backgroundColor:"rgba(29, 27, 38, 0.44)",
             borderColor: "rgba(29, 27, 38, 0.37)",
-            data: lightValues,
+            data: graphValues['light'],
             lineTension: 0.1
         }]
     },
@@ -154,7 +161,7 @@ const lightChart = new Chart("lightChart", {
         },
         scales: {
         yAxes: [{
-            ticks: {min: 300, max: 4000},
+            ticks: {min: 0, max: 3000},
             scaleLabel: {
                 display: true,
                 labelString: 'Light Value'
@@ -169,14 +176,14 @@ const lightChart = new Chart("lightChart", {
         }
     }
 });
-const distChart = new Chart("distChart", {
+charts["dist"] = new Chart("distChart", {
     type: "line",
     data: {
-        labels: tempDist,
+        labels: intervals['dist'],
         datasets: [{
             backgroundColor:"rgba(29, 27, 38, 0.44)",
             borderColor: "rgba(29, 27, 38, 0.37)",
-            data: distValues,
+            data: graphValues['dist'],
             lineTension: 0.1
         }]
     },
@@ -188,7 +195,7 @@ const distChart = new Chart("distChart", {
         },
         scales: {
         yAxes: [{
-            ticks: {min: 0, max:90},
+            ticks: {min: 0, max:160},
             scaleLabel: {
                 display: true,
                 labelString: 'Distance (cm)'
@@ -205,50 +212,56 @@ const distChart = new Chart("distChart", {
 });
 
 // Update graph functions
-function updateTemp() {
-    if (!tempPaused) {
-        tempValues.push(data.temp);
-        tempValues.shift();
-        tempChart.data.datasets[0].data = tempValues;
-        tempChart.update();
-    } else {
-        tempIntervals.forEach((val, i) => {tempIntervals[i] = val+1});
-        tempChart.data.labels = tempIntervals;
-        tempChart.update();
-    }
-}
-function updateLight() {
-    if (!lightPaused) {
-        // Light chart update
-        lightValues.push(data.light);
-        lightValues.shift();
-        lightChart.data.datasets[0].data = lightValues;
-        lightChart.update();
-    } else {
-        tempLight.forEach((val, i) => {tempLight[i] = val+1});
-        lightChart.data.labels = tempLight;
-        lightChart.update();
-    }
-}
-function updateDist() {
-    if (!distPaused) {
-        // Dist chart update
-        distValues.push((data.dist > 200) ? null : data.dist);
-        distValues.shift();
-        distChart.data.datasets[0].data = distValues;
-        distChart.update();
-    } else {
-        tempDist.forEach((val, i) => {tempDist[i] = val+1});
-        distChart.data.labels = tempDist;
-        distChart.update();
+const updateFunction = {
+    "temp": () => {
+        if (!paused['temp']) {
+            graphValues['temp'].push(data.temp);
+            graphValues['temp'].shift();
+            charts["temp"].data.datasets[0].data = graphValues['temp'];
+            charts["temp"].update();
+        } 
+        else {
+            intervals['temp'].forEach((val, i) => {intervals['temp'][i] = val+1});
+            charts["temp"].data.labels = intervals['temp'];
+            charts["temp"].update();
+        }
+    },
+    "light": () => {
+        if (!paused['light']) {
+            // Light chart update
+            graphValues['light'].push(data.light);
+            graphValues['light'].shift();
+            charts["light"].data.datasets[0].data = graphValues['light'];
+            charts["light"].update();
+        } else {
+            intervals['light'].forEach((val, i) => {intervals['light'][i] = val+1});
+            charts["light"].data.labels = intervals['light'];
+            charts["light"].update();
+        }
+    },
+    "dist": () => {
+        if (!paused['dist']) {
+            // Dist chart update
+            graphValues['dist'].push((data.dist > 200) ? null : data.dist);
+            graphValues['dist'].shift();
+            charts["dist"].data.datasets[0].data = graphValues['dist'];
+            charts["dist"].update();
+        } else {
+            intervals['dist'].forEach((val, i) => {intervals['dist'][i] = val+1});
+            charts["dist"].data.labels = intervals['dist'];
+            charts["dist"].update();
+        }
     }
 }
 
+
 // Doesn't really do much, just checks if server and esp32 are still valid
-const update = setInterval(() => {
+setInterval(() => {
     if (!server_connected || !esp32_connected) {
         // reconnects every 5s
-        reconnect = setInterval(connect, 5000);
+        if (!server_connected && reconnect == null) {
+            reconnect = setInterval(connect, 5000)
+        };
         document.getElementById("main").style.filter = "blur(1.5rem)";
         document.getElementById("alert").style.visibility = "visible";
 
@@ -263,186 +276,109 @@ const update = setInterval(() => {
 
 
 // Creates updates cycles for graphs
-let tempUpdate = setInterval(updateTemp, 1000);
-
-let lightUpdate = setInterval(updateLight, 1000);
-
-let distUpdate = setInterval(updateDist, 1000);
-
-
-// Following lines are a lot of copy-pasted code (ik theres a lot above too but this ones really bad)
-// In the future i want to clean these up
+let updates = {
+    "temp": setInterval(updateFunction['temp'], 1000),
+    "light": setInterval(updateFunction['light'], 1000),
+    "dist": setInterval(updateFunction['dist'], 1000)
+}
 
 // Pausing functionality
-document.getElementById('tempButton').addEventListener('click', tempClick);
-let tempPaused = false;
-async function tempClick() {
-    tempPaused = !tempPaused;
+let paused = {'temp' : false, 'light' : false, 'dist' : false}
+document.getElementById('tempButton').addEventListener('click', () => {pause("temp")});
+document.getElementById('lightButton').addEventListener('click', () => {pause('light')});
+document.getElementById('distButton').addEventListener('click', () => {pause('dist')});
+// Pause function
+async function pause(graph) {
+    paused[graph] = !paused[graph];
 
-    if (tempPaused) {
-        document.getElementById('tempButtonText').innerHTML = "▷";
+    if (paused[graph]) {
+        document.getElementById(`${graph}ButtonText`).innerHTML = "▷";
+        document.getElementById(`${graph}TimeLeft`).classList.remove('hide');
+        document.getElementById(`${graph}Drop`).disabled = true;
+
     } else {
-        document.getElementById('tempButtonText').innerHTML = "||";
-        await fetchData(tempMode, true, false, false);
-        tempChart.data.datasets[0].data = tempValues;
-        tempIntervals = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-        tempChart.data.labels = tempIntervals;
-        tempChart.update();
+        document.getElementById(`${graph}Drop`).disabled = false;
+        document.getElementById(`${graph}ButtonText`).innerHTML = "||";
+        document.querySelectorAll(`.${graph}Time`).forEach((element) => {element.classList.add('hide')});
+        times[graph] = 0;
+        await fetchData(graphModes[graph], graph);
+        charts[graph].data.datasets[0].data = graphValues[graph];
+        intervals[graph] = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+        charts[graph].data.labels = intervals[graph];
+        charts[graph].update();
     }
-}
 
-document.getElementById('lightButton').addEventListener('click', lightClick);
-let lightPaused = false;
-async function lightClick() {
-    lightPaused = !lightPaused;
-
-    if (lightPaused) {
-        document.getElementById('lightButtonText').innerHTML = "▷";
-    } else {
-        document.getElementById('lightButtonText').innerHTML = "||";
-        await fetchData(lightMode, false, true, false);
-        lightChart.data.datasets[0].data = lightValues;
-        tempLight = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-        lightChart.data.labels = tempLight;
-        lightChart.update();
-    }
-}
-
-document.getElementById('distButton').addEventListener('click', distClick);
-let distPaused = false;
-async function distClick() {
-    distPaused = !distPaused;
-
-    if (distPaused) {
-        document.getElementById('distButtonText').innerHTML = "▷";
-    } else {
-        document.getElementById('distButtonText').innerHTML = "||";
-        await fetchData(distMode, false, false, true);
-        distChart.data.datasets[0].data = distValues;
-        tempDist = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-        distChart.data.labels = tempDist;
-        distChart.update();
-    }
 }
 
 
-
-
-
+// Track interval modes
+let graphModes = {
+    'temp': "Seconds",
+    'light': "Seconds",
+    'dist': "Seconds"
+}
 // Change intervals for temp
-document.getElementById('tempSeconds').addEventListener('click', tempSeconds);
-let tempMode = "sec";
-async function tempSeconds() {
-    clearInterval(tempUpdate);
-    document.getElementById('tempDrop').innerHTML = "Seconds";
-    // Get recent seconds data
-    tempMode = "sec";
-    await fetchData("sec", true, false, false);
-    tempChart.data.datasets[0].data = tempValues;
-    tempChart.update();
-    // Start interval
-    tempUpdate = setInterval(updateTemp, 1000);
-}
-
-document.getElementById('tempMinutes').addEventListener('click', tempMinutes);
-async function tempMinutes() {
-    clearInterval(tempUpdate);
-    document.getElementById('tempDrop').innerHTML = "Minutes";
-    tempMode = "min";
-    await fetchData("min", true, false, false);
-    tempChart.data.datasets[0].data = tempValues;
-    tempChart.update();
-    tempUpdate = setInterval(updateTemp, 60000);
-}
-
-document.getElementById('tempHours').addEventListener('click', tempHours);
-async function tempHours() {
-    clearInterval(tempUpdate);
-    document.getElementById('tempDrop').innerHTML = "Hours";
-    tempMode = "hr";
-    await fetchData("hr", true, false, false);
-    tempChart.data.datasets[0].data = tempValues;
-    tempChart.update();
-    tempUpdate = setInterval(updateTemp, 3600000);
-}
-
-
-
+document.getElementById('tempSeconds').addEventListener('click', () => {changeInterval("temp", "Seconds")});
+document.getElementById('tempMinutes').addEventListener('click', () => {changeInterval("temp","Minutes")});
+document.getElementById('tempHours').addEventListener('click',   () => {changeInterval("temp", "Hours")});
 
 // Change intervals for light
-document.getElementById('lightSeconds').addEventListener('click', lightSeconds);
-let lightMode = "sec";
-async function lightSeconds() {
-    clearInterval(lightUpdate);
-    document.getElementById('lightDrop').innerHTML = "Seconds";
-    lightMode = "sec";
-    // Get recent seconds data
-    await fetchData("sec", false, true, false);
-    lightChart.data.datasets[0].data = lightValues;
-    lightChart.update();
-    // Start interval
-    lightUpdate = setInterval(updateLight, 1000);
-}
-
-document.getElementById('lightMinutes').addEventListener('click', lightMinutes);
-async function lightMinutes() {
-    clearInterval(lightUpdate);
-    document.getElementById('lightDrop').innerHTML = "Minutes";
-    lightMode = "min";
-    await fetchData("min", false, true, false);
-    lightChart.data.datasets[0].data = lightValues;
-    lightChart.update();
-    lightUpdate = setInterval(updateLight, 60000);
-}
-
-document.getElementById('lightHours').addEventListener('click', lightHours);
-async function lightHours() {
-    clearInterval(lightUpdate);
-    document.getElementById('lightDrop').innerHTML = "Hours";
-    lightMode = "hr";
-    await fetchData("hr", false, true, false);
-    lightChart.data.datasets[0].data = lightValues;
-    lightChart.update();
-    lightUpdate = setInterval(updateDist, 3600000);
-}
-
-
-
-
+document.getElementById('lightSeconds').addEventListener('click', () => {changeInterval("light", "Seconds")});
+document.getElementById('lightMinutes').addEventListener('click', () => {changeInterval("light", "Minutes")});
+document.getElementById('lightHours').addEventListener('click',   () => {changeInterval("light", "Hours")});
 
 // Change intervals for dist
-document.getElementById('distSeconds').addEventListener('click', distSeconds);
-let distMode = "sec";
-async function distSeconds() {
-    clearInterval(distUpdate);
-    document.getElementById('distDrop').innerHTML = "Seconds";
-    distMode = "sec";
-    // Get recent seconds data
-    await fetchData("sec", false, false, true);
-    distChart.data.datasets[0].data = distValues;
-    distChart.update();
-    // Start interval
-    distUpdate = setInterval(updateDist, 1000);
+document.getElementById('distSeconds').addEventListener('click', () => {changeInterval("dist", "Seconds")});
+document.getElementById('distMinutes').addEventListener('click', () => {changeInterval("dist", "Minutes")});
+document.getElementById('distHours').addEventListener('click',   () => {changeInterval("dist", "Hours")});
+
+async function changeInterval(graph, mode) {
+    document.getElementById(`${graph}Drop`).innerHTML = mode;
+    clearInterval(updates[graph]);
+    graphModes[graph] = mode;
+    await fetchData(mode, graph);
+    charts[graph].data.datasets[0].data = graphValues[graph];
+    charts[graph].update();
+    updates[graph] = setInterval(updateFunction[graph], (mode === "Seconds") ? 1000 : (mode === "Minutes") ? 60000 : (mode === "Hours") ? 3600000 : 1000);
 }
 
-document.getElementById('distMinutes').addEventListener('click', distMinutes);
-async function distMinutes() {
-    clearInterval(distUpdate);
-    document.getElementById('distDrop').innerHTML = "Minutes";
-    distMode = "min";
-    await fetchData("min", false, false, true);
-    distChart.data.datasets[0].data = distValues;
-    distChart.update();
-    distUpdate = setInterval(updateDist, 60000);
+// Tracks timeline
+let times = {
+    "temp":0,
+    "light": 0,
+    "dist": 0
 }
+// temp timeline buttons
+document.getElementById('tempTimeLeft').addEventListener('click', ()=>{timeline('temp', 'left')});
+document.getElementById('tempTimeRight').addEventListener('click', ()=>{timeline('temp', 'right')});
+// light timeline buttons
+document.getElementById('lightTimeLeft').addEventListener('click', ()=>{timeline('light', 'left')});
+document.getElementById('lightTimeRight').addEventListener('click', ()=>{timeline('light', 'right')});
+// light timeline buttons
+document.getElementById('distTimeLeft').addEventListener('click', ()=>{timeline('dist', 'left')});
+document.getElementById('distTimeRight').addEventListener('click', ()=>{timeline('dist', 'right')});
 
-document.getElementById('distHours').addEventListener('click', distHours);
-async function distHours() {
-    clearInterval(distUpdate);
-    document.getElementById('distDrop').innerHTML = "Hours";
-    distMode = "hr";
-    await fetchData("hr", false, false, true);
-    distChart.data.datasets[0].data = distValues;
-    distChart.update();
-    distUpdate = setInterval(updateDist, 3600000);
+// temperature timeline
+async function timeline(graph, direction) {
+    if (direction == 'left') {
+        document.getElementById(`${graph}TimeRight`).classList.remove('hide');
+        times[graph] += 1;
+        intervals[graph].forEach((val, i) => {intervals[graph][i] = val+15});
+        charts[graph].data.labels = intervals[graph];
+        await fetchData(graphModes[graph], graph, times[graph]);
+        charts[graph].data.datasets[0].data = graphValues[graph];
+        charts[graph].update();
+
+
+    } else if (direction == 'right') {
+        if (times[graph] > 0) {
+            if (times[graph] == 1) document.getElementById(`${graph}TimeRight`).classList.add('hide');
+            times[graph] -= 1;
+            intervals[graph].forEach((val, i) => {intervals[graph][i] = val-15});
+            charts[graph].data.labels = intervals[graph];
+            await fetchData(graphModes[graph], graph, times[graph]);
+            charts[graph].data.datasets[0].data = graphValues[graph];
+            charts[graph].update();
+        }
+    }
 }

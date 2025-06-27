@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/buttons.css">
-    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <link rel="icon" type="image/png" href="/assets/favicon.png?v=0.1">
     <title>Dashboard | ESP32/Arduino</title>
 </head>
 <body>
@@ -19,7 +19,7 @@
                 <button class="button" id="tempButton">
                     <p id="tempButtonText">||</p>
                 </button>
-                <div class="drowndown tempDropdownDiv">
+                <div class="dropdown tempDropdownDiv">
                     <button class="button" id="tempDrop">Seconds</button>
                     <div class="dropdown-content temp-cont" id="tempDropdown">
                         <a id="tempSeconds">Seconds</a>
@@ -27,6 +27,8 @@
                         <a id="tempHours">Hours</a>
                     </div>
                 </div>
+                <button class="button tempTime hide" id="tempTimeLeft">ᐊ</button>
+                <button class="button tempTime hide" id="tempTimeRight">ᐅ</button>
             </div>
             <canvas id="tempChart" style="max-width: 50vw; min-width: 50vw"></canvas> 
         </div>
@@ -43,7 +45,7 @@
                 <button class="button" id="lightButton">
                     <p id="lightButtonText">||</p>
                 </button>
-                <div class="drowndown lightDropdownDiv">
+                <div class="dropdown lightDropdownDiv">
                     <button class="button" id="lightDrop">Seconds</button>
                     <div class="dropdown-content light-cont" id="lightDropdown">
                         <a id="lightSeconds">Seconds</a>
@@ -51,10 +53,12 @@
                         <a id="lightHours">Hours</a>
                     </div>
                 </div>
+                <button class="button lightTime hide" id="lightTimeLeft">ᐊ</button>
+                    <button class="button lightTime hide" id="lightTimeRight">ᐅ</button>
                 <button class="button" id="distButton">
                     <p id="distButtonText">||</p>
                 </button>
-                <div class="drowndown distDropdownDiv">
+                <div class="dropdown distDropdownDiv">
                     <button class="button" id="distDrop">Seconds</button>
                     <div class="dropdown-content dist-cont" id="distDropdown">
                         <a id="distSeconds">Seconds</a>
@@ -62,6 +66,8 @@
                         <a id="distHours">Hours</a>
                     </div>
                 </div>
+                <button class="button distTime hide" id="distTimeLeft">ᐊ</button>
+                <button class="button distTime hide" id="distTimeRight">ᐅ</button>
             </div>
             <div class="doubleGraph">
                 <canvas id="lightChart" style="max-width: 40%; min-width: 40%;"></canvas> 
