@@ -1,6 +1,6 @@
-const API_URL = "http://10.0.0.2/api"
+export const API_URL = "10.0.0.2"
 export async function getTable(table, time) {
-    const query = `${API_URL}/graph?time=${time}&table=${table}`;
+    const query = `http://${API_URL}/api/graph?time=${time}&table=${table}`;
     try {
         const response = await fetch(query, {
             method: 'GET'

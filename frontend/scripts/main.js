@@ -1,4 +1,4 @@
-import { getTable } from "./api.js"
+import { getTable, API_URL} from "./api.js"
 
 let server_connected = false;
 let esp32_connected = false;
@@ -12,7 +12,7 @@ let reconnect = setInterval(()=>{}, 99999);
 function connect() {
     clearInterval(reconnect);
 
-    client = new WebSocket('ws://127.0.0.1:8080');
+    client = new WebSocket(`ws://${API_URL}:8080`);
     // Websocket client functions
     client.onopen = function(event) {
         server_connected = true;
