@@ -11,7 +11,6 @@ let reconnect = setInterval(()=>{}, 99999);
 
 function connect() {
     clearInterval(reconnect);
-    reconnect = null;
 
     client = new WebSocket('ws://127.0.0.1:8080');
     // Websocket client functions
@@ -43,6 +42,8 @@ function connect() {
         }
 
     }
+
+    reconnect = null;
 }
 connect();
 
@@ -79,11 +80,12 @@ async function fetchData(mode, graph, time=0) {
                 return;
         }
 
-        const dataLength = secondsDataArray.length;
         if (secondsDataArray != null) {
             if (graph === "temp" || graph === "all") graphValues['temp'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
             if (graph === "light" || graph === "all") graphValues['light'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
             if (graph === "dist" || graph === "all") graphValues['dist'] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+
+            const dataLength = secondsDataArray.length;
 
             if (dataLength != 0) {
                 for (let i = 0; i < dataLength; i++) {
@@ -215,6 +217,7 @@ charts["dist"] = new Chart("distChart", {
 const updateFunction = {
     "temp": () => {
         if (!paused['temp']) {
+            
             graphValues['temp'].push(data.temp);
             graphValues['temp'].shift();
             charts["temp"].data.datasets[0].data = graphValues['temp'];
@@ -307,7 +310,6 @@ async function pause(graph) {
         charts[graph].data.labels = intervals[graph];
         charts[graph].update();
     }
-
 }
 
 

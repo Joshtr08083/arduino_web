@@ -13,9 +13,18 @@ app.use((req, res, next) => {
     next();
 });
 
+const tables = ['seconds', 'minutes', 'hours']
 
-app.get('/api/seconds-graph', async (req, res) => {
-    const query = `SELECT * FROM seconds WHERE timestamp > DATETIME('now', '${-16 - (req.query.time * 16)} seconds') AND timestamp < DATETIME('now', '${-16 * req.query.time} seconds')`;
+app.get('/api/graph', async (req, res) => {
+    let query;
+    if (tables.includes(req.query.table)) {
+        query = `SELECT * FROM ${req.query.table} WHERE timestamp > DATETIME('now', '${-16 - (req.query.time * 16)} ${req.query.table}') AND timestamp < DATETIME('now', '${-16 * req.query.time} ${req.query.table}')`;
+        console.log(query);
+    } else {
+        res.status(404).send("Unknown table");
+        return;
+    }
+
 
     try {
         const resData = await sql.fetchAll(db, query);
@@ -28,33 +37,6 @@ app.get('/api/seconds-graph', async (req, res) => {
 
 })
 
-app.get('/api/minutes-graph', async (req, res) => {
-    const query = `SELECT * FROM minutes WHERE timestamp > DATETIME('now', '-16 minutes')`;
-
-    try {
-        const resData = await sql.fetchAll(db, query);
-        res.status(200).send(`{\"success\":true, \"response\":${JSON.stringify(resData)}}`);
-
-    } catch (error) {
-        console.error("DB error: ", error);
-        res.status(500).send("Internal server error");
-    }
-
-})
-
-app.get('/api/hours-graph', async (req, res) => {
-    const query = `SELECT * FROM hours WHERE timestamp > DATETIME('now', '-16 hours')`;
-
-    try {
-        const resData = await sql.fetchAll(db, query);
-        res.status(200).send(`{\"success\":true, \"response\":${JSON.stringify(resData)}}`);
-
-    } catch (error) {
-        console.error("DB error: ", error);
-        res.status(500).send("Internal server error");
-    }
-
-})
 
 app.listen(port, '127.0.0.1', () => {
     console.log(`Express listening on http://localhost:${port}`)
