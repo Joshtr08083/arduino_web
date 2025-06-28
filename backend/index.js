@@ -5,7 +5,10 @@ require('./src/api.js');
 
 // connect to database
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database("./data/json_log.db", sqlite3.OPEN_READWRITE);
+const path = require('path');
+const DB_PATH =  path.join(__dirname, 'data');
+console.log(DB_PATH)
+const db = new sqlite3.Database(path.join(DB_PATH, 'json_log.db'), sqlite3.OPEN_READWRITE);
 // add write to database function
 const sql = require('./src/sql.js');
 
