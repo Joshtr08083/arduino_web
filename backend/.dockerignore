@@ -4,3 +4,5 @@ node_modules
 /data/*.db-shm
 /data/*.db-wal
 .vscode
+.gitignore
+.DS_Store

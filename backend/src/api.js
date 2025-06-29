@@ -43,6 +43,6 @@ app.get('/api/graph', async (req, res) => {
 })
 
 
-app.listen(port, '127.0.0.1', () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Express listening on http://localhost:${port}`)
 })

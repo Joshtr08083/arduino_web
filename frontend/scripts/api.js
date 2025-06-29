@@ -1,7 +1,7 @@
-export let API_URL = "127.0.0.1:8082"
+import { global } from "./globals.js?v=2.6";
 
 export async function getTable(table, time) {
-    const query = `http://${API_URL}/api/graph?time=${time}&table=${table}`;
+    const query = `${global.API_URL}/api/graph?time=${time}&table=${table}`;
     try {
         const response = await fetch(query, {
             method: 'GET'
