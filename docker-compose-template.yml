@@ -4,18 +4,18 @@ services:
     # Dont actually map ports, nginx will reverse proxy them
   
     environment:
-      - ESP32_TOKEN=3rugOhdqfk1jwoLh5sShIW1vfaIaw4EIf5AOD0tyPf4yOpkJ0AP3QSgLtLviKaJV
+      - ESP32_TOKEN=TOKEN
     volumes:
       - arduino-data:/app/data
     ports:
-      - 192.168.86.23:8080
+      - LISTEN_IP:8080
   frontend:
     image: joshtr083/arduino-web:frontend
     extra_hosts:
     - "host.docker.internal:host-gateway"
     ports:
       # change to device ip for webpage
-      - 10.0.0.1:8081:8080
+      - LISTEN_IP:PORT:8080
     depends_on:
       - backend
 
