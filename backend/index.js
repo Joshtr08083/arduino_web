@@ -1,3 +1,5 @@
+const WS_PORT = 8080;
+
 require('dotenv').config();
 
 // Express api stuff for seconding data to frontend
@@ -25,7 +27,7 @@ let lastMessageTime = Date.now();
 // Create websocket connection
 const WebSocket = require('ws');
 // Create websocket connection to esp32
-const wss = new WebSocket.Server({ port: 8080});
+const wss = new WebSocket.Server({ port: WS_PORT});
 // Websocket connection manager
 wss.on('connection', function connection(ws) {
     ws.clientID = null;
