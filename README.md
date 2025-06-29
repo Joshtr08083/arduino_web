@@ -38,4 +38,5 @@ Sensord --> ESP32 --> Server --> Web UI
         - This will control how your frontend is accessed.
     - Backend port: ` - LISTEN_IP:PORT:8080`
         - This is where your esp32 will connect to backend
+        - Frontend should not use this, but FRONTEND_IP/api/ or FRONTEND_IP/ws/
 - Run docker-compose or [add to systemd](https://lmgtfy2.com/s/b1fZP7) or idk what the best method is.
