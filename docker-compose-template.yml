@@ -1,18 +1,29 @@
 services:
   backend:
     image: joshtr083/arduino-web:backend
+<<<<<<< HEAD
     # Dont actually map ports, use /api and /ws on frontend
+=======
+   
+  
+>>>>>>> 602704022226459fdfadfdc2cc838c10f32115e5
     environment:
       - ESP32_TOKEN=TOKEN
     volumes:
       - arduino-data:/app/data
+<<<<<<< HEAD
 
+=======
+    ports:
+    # Use port 8080 (or whatever ur esp32 connects to)
+      - LISTEN_IP:8080:8080
+>>>>>>> 602704022226459fdfadfdc2cc838c10f32115e5
   frontend:
     image: joshtr083/arduino-web:frontend
     extra_hosts:
     - "host.docker.internal:host-gateway"
     ports:
-      # change to device ip for webpage
+      # change to what you want your webpage to listen on (or just do 80:8080 for public)
       - LISTEN_IP:PORT:8080
     depends_on:
       - backend
