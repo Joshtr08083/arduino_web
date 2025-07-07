@@ -1,14 +1,12 @@
 services:
   backend:
     image: joshtr083/arduino-web:backend
-    # Dont actually map ports, nginx will reverse proxy them
-  
+    # Dont actually map ports, use /api and /ws on frontend
     environment:
       - ESP32_TOKEN=TOKEN
     volumes:
       - arduino-data:/app/data
-    ports:
-      - LISTEN_IP:8080
+
   frontend:
     image: joshtr083/arduino-web:frontend
     extra_hosts:
