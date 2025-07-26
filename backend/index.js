@@ -109,33 +109,33 @@ setInterval(() => {
     }   
 }, 500);
 
-// Save every second
-setInterval(async () => {
-    // Writes data to seconds table
-    const write = data;
-    if (write) {
-        write_console('Saving   --S ' + write);
-        await sql.write_json(db, 'seconds', write);
-    }
-}, 1000);
-// Save every minute
-setInterval(async () => {
-    const write = data;
-    // Writes data to seconds table
-    if (write) {
-        write_console('Saving   --M ' + write);
-        await sql.write_json(db, 'minutes', write);
-    }
-}, 60000);
-// Save every hour
-setInterval(async () => {
-    const write = data;
-    // Writes data to seconds table
-    if (write) {
-        write_console('Saving   --H ' + write);
-        await sql.write_json(db, 'hours', write);
-    }
-}, 3600000);
+// // Save every second
+// setInterval(async () => {
+//     // Writes data to seconds table
+//     const write = data;
+//     if (write) {
+//         write_console('Saving   --S ' + write);
+//         await sql.write_json(db, 'seconds', write);
+//     }
+// }, 1000);
+// // Save every minute
+// setInterval(async () => {
+//     const write = data;
+//     // Writes data to seconds table
+//     if (write) {
+//         write_console('Saving   --M ' + write);
+//         await sql.write_json(db, 'minutes', write);
+//     }
+// }, 60000);
+// // Save every hour
+// setInterval(async () => {
+//     const write = data;
+//     // Writes data to seconds table
+//     if (write) {
+//         write_console('Saving   --H ' + write);
+//         await sql.write_json(db, 'hours', write);
+//     }
+// }, 3600000);
 
 let bufferMsg = "";
 let repeats = 0;
