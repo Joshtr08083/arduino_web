@@ -55,7 +55,7 @@ const leafToMaterialMap: Record<LeafId, MaterialKey> = {
   Leaf4: 'leaf4'
 }
 
-const LOW_THRESHOLD = 20;
+const LOW_THRESHOLD = 50;
 
 export function Plant( { leafStates } : { leafStates: leafProps}) {
   const { nodes, materials } = useGLTF('/plant.gltf') as unknown as GLTFResult
@@ -63,7 +63,9 @@ export function Plant( { leafStates } : { leafStates: leafProps}) {
   useEffect(() => {
     for (const leaf in leafStates) {
       
-      const level = leafStates[leaf as keyof leafProps] * 2000;
+      const level = leafStates[leaf as keyof leafProps]  * 1000;
+      
+      
       // console.log((level));
       const mat = materials[leafToMaterialMap[leaf as LeafId]] as THREE.MeshStandardMaterial;
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer, useRef, useState } from "react";
 import { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
@@ -10,6 +10,37 @@ import { OrbitControls } from "@react-three/drei";
 
 import DataList from "./components/DataList";
 import AlertModal from "./components/AlertModal";
+import Toasts from "./components/Toasts";
+
+type Toast = {touchId: number; percentDiff: number; key: string}
+type Action = 
+	| {type: 'PUSH'; payload: Toast}
+	| {type: 'SHIFT'}
+	| {type: 'DELETE'; target: number};
+
+function manageToasts(state: Toast[], action: Action): Toast[] {
+
+	switch (action.type) {
+		
+		case 'PUSH':
+			if (state.some((toast) => toast.key === action.payload.key)) {
+				console.log("Duplicate entry");
+				return state;
+			}
+
+			if (state.length > 7) {
+				const trimmed = state.length > 6 ? state.slice(-7) : state;
+				return [...trimmed, action.payload]
+			}
+			return [...state, action.payload];
+		case 'SHIFT':
+			return state.slice(1);
+		case 'DELETE':
+			return state.filter((_, idx) => idx !== action.target);
+		default:
+			throw Error('Unknown action.');
+	}
+}
 
 function App() {
 	const [leafStates, setLeafStates] = useState({
@@ -26,9 +57,18 @@ function App() {
 		{ reading: -1, avg: -1 },
 	]);
 
+	const socketClose = useRef(false);
+
+	// pop-ups
 	const [showAlertModal, setShowAlertModal] = useState(false);
 	const [modalContent, setModalContent] = useState({ title: "", content: "" });
 
+	const [toasts, setToasts] = useReducer(manageToasts, [{touchId: 0, percentDiff: 1, key:""}])
+	const onToastClose = (id: number) => {
+		setToasts({type: "DELETE", target: id})
+	}
+
+	// janky data processing
 	let dataBuffer = [
 		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -38,28 +78,41 @@ function App() {
 	let dataAverages = [0, 0, 0, 0];
 	let diffPercents = [0, 0, 0, 0];
 
+
+
+
 	// Websocket Setup
 	const WS_URL = "ws://127.0.0.1:8080";
 
 	useEffect(() => {
+		setToasts({type: "DELETE", target: 0})
+
 		const socket = new WebSocket(WS_URL);
 
+
 		socket.addEventListener("open", () => {
+			if (showAlertModal && modalContent.title === "Server Disconnected") {
+				setShowAlertModal(false);
+			}
 			socket.send('{"id":"a","auth":"a"}');
+			socketClose.current = false;
+		
 		});
 		socket.addEventListener("close", () => {
-			setModalContent({
-				title: "Server Disconnected",
-				content:
-					"Lost connection to server. Ensure server is running and reload.",
-			});
-			setShowAlertModal(true);
+			if (!socketClose.current) {
+				setModalContent({
+					title: "Server Disconnected",
+					content:
+						"Lost connection to server. Ensure server is running and reload.",
+				});
+				setShowAlertModal(true);
+			}
 		});
 		socket.addEventListener("message", async (event) => {
-			
+
 			if (event.data) {
+				
 				if (event.data.text) {
-					
 					if (showAlertModal) {
 						setShowAlertModal(false);
 					}
@@ -70,20 +123,20 @@ function App() {
 					for (let i = 0; i < 4; i++) {
 						let newData = dataJSON[`touch${i + 1}`];
 
-						// Populate empty data
 						if (dataBuffer[i][0] === -1) {
 							dataBuffer[i].fill(newData);
 							dataAverages[i] = newData;
 						} else {
-							// Calculate percent from average
+
 							const diffPercent = Math.abs(
 								(newData - dataAverages[i]) /
 									(dataAverages[i] != 0 ? dataAverages[i] : 1)
 							);
 							diffPercents[i] = diffPercent;
 
-							// recalculates average if diffpercent is low
-							if (diffPercent < 1) {
+							
+							if (diffPercent < 0.03) {
+								
 								dataBuffer[i].shift();
 								dataBuffer[i].push(newData);
 								const count = dataBuffer[i].reduce(
@@ -92,6 +145,11 @@ function App() {
 								);
 
 								dataAverages[i] = count / 15;
+							} else {
+								setToasts({type: "PUSH", payload: {touchId: i+1, percentDiff: diffPercent, key: `${i+1}-${diffPercent.toFixed(6)}-${Math.random()}`}})
+								const id = toasts.length;
+								
+								setTimeout(()=>{onToastClose(id)}, 5000);
 							}
 						}
 					}
@@ -126,6 +184,15 @@ function App() {
 				
 			}
 		});
+
+
+
+		return () => {
+			if (socket.readyState) {
+				socketClose.current = true;
+				socket.close();
+			}
+		};
 	}, []);
 
 	return (
@@ -153,6 +220,7 @@ function App() {
 				<AlertModal title={modalContent.title} show={showAlertModal}>
 					{modalContent.content}
 				</AlertModal>
+				<Toasts toasts={toasts} onClose={onToastClose}/>
 			</div>
 		</>
 	);
