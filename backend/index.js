@@ -32,9 +32,6 @@ const wss = new WebSocket.Server({ port: WS_PORT});
 wss.on('connection', function connection(ws) {
     ws.clientID = null;
 
-    write_console(`Client connected\nClients connected: \n`);
-    console.table(clients);
-
     ws.on('message', function incoming(message) {
         try {
             const parse = JSON.parse(message);
@@ -51,6 +48,7 @@ wss.on('connection', function connection(ws) {
                     ws.clientID = "FRONTEND";
                     write_console("Connected Frontend");
                 }
+                console.table(clients);
             // Otherwise verify if its data from esp32
             } else if (ws.clientID == "ESP32") {
                 lastMessageTime = Date.now();
@@ -78,6 +76,7 @@ wss.on('connection', function connection(ws) {
         } else {
             write_console("Unknown client disconnected");
         }
+        console.table(clients);
 
     });
 

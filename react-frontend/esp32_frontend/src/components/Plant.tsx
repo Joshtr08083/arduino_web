@@ -44,6 +44,7 @@ interface leafProps {
   Leaf4: number
 }
 
+
 type LeafId = 'Leaf1' | 'Leaf2' | 'Leaf3' | 'Leaf4'
 type MaterialKey = 'leaf1' | 'leaf2' | 'leaf3' | 'leaf4'
 
@@ -79,11 +80,11 @@ export function Plant( { leafStates } : { leafStates: leafProps}) {
 
   return (
     <group dispose={null}>
-      <mesh geometry={nodes.Leaf3.geometry} material={materials.leaf3} position={[0.095, 0.999, -0.127]} rotation={[0, -0.49, 0]} />
-      <mesh geometry={nodes.Leaf2.geometry} material={materials.leaf2} position={[-0.094, 0.896, -0.127]} rotation={[0, 0.522, 0]} scale={0.774} />
-      <mesh geometry={nodes.Leaf4.geometry} material={materials.leaf4} position={[0.077, 0.999, 0.069]} rotation={[Math.PI, -1.098, Math.PI]} />
-      <mesh geometry={nodes.Leaf1.geometry} material={materials.leaf1} position={[0.057, 0.851, 0.029]} rotation={[-Math.PI, 1.198, -Math.PI]} />
-      <group position={[-0.025, 0.426, 0]} scale={0.424}>
+      <mesh geometry={nodes.Leaf3.geometry} material={materials.leaf3} position={[0.095, 0.799, -0.127]} rotation={[0, -0.49, 0]} />
+      <mesh geometry={nodes.Leaf2.geometry} material={materials.leaf2} position={[-0.094, 0.696, -0.127]} rotation={[0, 0.522, 0]} scale={0.774} />
+      <mesh geometry={nodes.Leaf4.geometry} material={materials.leaf4} position={[0.077, 0.799, 0.069]} rotation={[Math.PI, -1.098, Math.PI]} />
+      <mesh geometry={nodes.Leaf1.geometry} material={materials.leaf1} position={[0.057, 0.651, 0.029]} rotation={[-Math.PI, 1.198, -Math.PI]} />
+      <group position={[-0.025, 0.226, 0]} scale={0.424}>
         <mesh geometry={nodes.Pot_1.geometry} material={materials.FlowerPot} />
         <mesh geometry={nodes.Pot_2.geometry} material={materials.Soil} />
       </group>
