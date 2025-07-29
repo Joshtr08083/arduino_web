@@ -1,49 +1,65 @@
-import { type ReactNode } from "react";
+type ModalType = "SERVER_ERROR" | "ESP32_ERROR";
 
 interface Props {
-    show: boolean
-	title: string;
-	children: ReactNode;
+	show: boolean;
+	type: string;
+	onReconnect: () => void;
 }
 
-const AlertModal = ( { show, title, children} : Props) => {
+function getContent(type: ModalType) {
+	switch (type) {
+		case "SERVER_ERROR":
+			return {
+				title: "Server Disconnect",
+				content:
+					"Lost connection to server (or never connected). Confirm server is running and click below to attempt to reconnect.",
+				button: true,
+			};
+		case "ESP32_ERROR":
+			return {
+				title: "ESP32 Not Responding",
+				content:
+					"No response from ESP32. Wait for connection or if you think this is an error try reloading.",
+				button: false,
+			};
+		default:
+			return { title: "", content: "", button: false };
+	}
+}
+
+const AlertModal = ({ show, type, onReconnect }: Props) => {
+	const content = getContent(type as ModalType);
+
 	return (
 		<div
-			className={`modal fade ${show ? 'show d-block' : 'd-none'}`}
+			className={`modal fade ${show ? "show d-block" : "d-none"}`}
 			id="staticBackdrop"
 			data-bs-backdrop="static"
 			data-bs-keyboard="false"
 			tabIndex={-1}
 			aria-labelledby="staticBackdropLabel"
 			aria-hidden="true"
+			style={{ backdropFilter: "blur(10px)" }}
 		>
-			<div className="modal-dialog modal-dialog-centered ">
-				<div className="modal-content bg-light text-dark">
-					<div className="modal-header border-dark">
+			<div className="modal-dialog modal-dialog-centered">
+				<div className="modal-content text-dark">
+					<div className="modal-header border-dark bg-dark text-light">
 						<h1 className="modal-title fs-5" id="staticBackdropLabel">
-							{title}
+							{content.title}
 						</h1>
-						{/* <button 
-                            onClick={onClose}
-							type="button"
-							className="btn-close"
-							aria-label="Close"
-						></button> */}
 					</div>
-					<div className="modal-body">{children}</div>
-					<div className="modal-footer border-dark">
-						{/* <button
-							onClick={onClose}
-							type="button"
-							className="btn btn-secondary"
-							data-bs-dismiss="modal"
-						>
-							Close
-						</button> */}
-						<button type="button" className="btn btn-primary" onClick={() => {location.reload()}}>
-							Reload
-						</button>
-					</div>
+					<div className={`modal-body bg-secondary ${!content.button && "rounded-bottom pt-4 pb-5"}`}>{content.content}</div>
+					{content.button && (
+						<div className="modal-footer border-dark bg-secondary p-1 pe-2">
+							<button
+								type="button"
+								className="btn btn-primary"
+								onClick={onReconnect}
+							>
+								Reconnect
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
