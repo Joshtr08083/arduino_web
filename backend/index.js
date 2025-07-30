@@ -1,6 +1,7 @@
 const WS_PORT = 8080;
 
 require('dotenv').config();
+const { CronJob } = require('cron');
 
 // Express api stuff for seconding data to frontend
 require('./src/api.js');
@@ -10,9 +11,19 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const DB_PATH =  path.join(__dirname, 'data');
 console.log(DB_PATH)
-const db = new sqlite3.Database(path.join(DB_PATH, 'json_log.db'), sqlite3.OPEN_READWRITE);
+
 // add write to database function
 const sql = require('./src/sql.js');
+
+const db = new sqlite3.Database(path.join(DB_PATH, 'json_log.db'), sqlite3.OPEN_READWRITE);
+const archivedb = new sqlite3.Database(path.join(DB_PATH, 'archive.db'));
+
+sql.execute (
+            db,
+            `ATTACH "${path.join(DB_PATH, 'archive.db')}" AS archive`
+);
+
+
 
 // data stores message
 let data;
@@ -108,35 +119,81 @@ setInterval(() => {
     }   
 }, 500);
 
-// Database deprecated for now
 
-// Save every second
-setInterval(async () => {
-    // Writes data to seconds table
-    const write = data;
-    if (write) {
-        write_console('Saving   --S ' + write);
-        await sql.write_json(db, 'seconds', write);
-    }
-}, 1000);
-// Save every minute
-setInterval(async () => {
-    const write = data;
-    // Writes data to seconds table
-    if (write) {
-        write_console('Saving   --M ' + write);
-        await sql.write_json(db, 'minutes', write);
-    }
-}, 60000);
-// Save every hour
-setInterval(async () => {
-    const write = data;
-    // Writes data to seconds table
-    if (write) {
-        write_console('Saving   --H ' + write);
-        await sql.write_json(db, 'hours', write);
-    }
-}, 3600000);
+// cron deez nuts
+const secondSaveCron = new CronJob(
+    '* * * * * *', // every second
+    async function() {
+        const write = data;
+        if (write) {
+            write_console('Saving   --S ' + write);
+            await sql.write_json(db, 'seconds', write);
+        }
+    },
+    null,
+    true,
+    'America/New_York'
+);
+const minuteSaveCron = new CronJob(
+    '* * * * *', // every minute
+    async function() {
+        const write = data;
+        if (write) {
+            write_console('Saving   --M ' + write);
+            await sql.write_json(db, 'minutes', write);
+        }
+    },
+    null,
+    true,
+    'America/New_York'
+);
+const hourSaveCron = new CronJob(
+    '0 * * * *', // every hour
+    async function() {
+        const write = data;
+        if (write) {
+            write_console('Saving   --H ' + write);
+            await sql.write_json(db, 'hours', write);
+        }
+    },
+    null,
+    true,
+    'America/New_York'
+);
+
+// data archival
+const secondArchiveCron = new CronJob(
+    '0 */6 * * *',  // every 6 hrs
+    async function() {
+        await sql.execute(db,  `INSERT OR IGNORE INTO archive.seconds SELECT * FROM main.seconds WHERE timestamp < DATETIME('now', '-6 hours')`)
+        await sql.execute(db, `DELETE FROM seconds WHERE timestamp < DATETIME('now', '-6 hours')`);
+    },
+    null,
+    true,
+    'America/New_York'
+);
+const minuteArchiveCron = new CronJob(
+    '0 0 */14 * *', // every 14 days
+    async function() {
+        await sql.execute(db, `INSERT OR IGNORE INTO archive.minutes SELECT * FROM main.minutes WHERE timestamp < DATETIME('now', '-14 days')`);
+        await sql.execute(db, `DELETE FROM minutes WHERE timestamp < DATETIME('now', '-14 days')`);
+    },
+    null,
+    true,
+    'America/New_York'
+);
+const hourArchiveCron = new CronJob(
+    '0 0 1 1 *', // Jan 1 00:00
+    async function() {
+        await sql.execute(db, `INSERT OR IGNORE INTO archive.hours SELECT * FROM main.hours WHERE timestamp < DATETIME('now', '-2 years')`);
+        await sql.execute(db, `DELETE FROM hours WHERE timestamp < DATETIME('now', '-2 years')`)
+    },
+    null,
+    true,
+    'America/New_York'
+);
+
+
 // TO-DO: Add functionality to move data into archive
 
 let bufferMsg = "";

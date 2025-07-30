@@ -12,7 +12,7 @@ const main = async () => {
         console.log("Added DATA directory")
     }
     const db = new sqlite3.Database(path.join(DB_PATH, 'json_log.db'));
-    const archivedb = new sqlite3.Database(path.join(DB_PATH, 'archive.db'));
+    // const archivedb = new sqlite3.Database(path.join(DB_PATH, 'archive.db'));
 
     try {
         // WAL mode
