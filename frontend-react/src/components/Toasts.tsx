@@ -24,7 +24,7 @@ const Toasts = ( { toasts, onClose } : Props ) => {
 
                     <div className="toast-header bg-secondary text-light">
                         {/* <img src="..." className="rounded me-2" alt="..."> */}
-                        <strong className="me-auto"> Bootstrap</strong>
+                        <strong className="me-auto"> Possible Touch </strong>
                         <button
                             type="button"
                             className="btn-close"
@@ -32,7 +32,7 @@ const Toasts = ( { toasts, onClose } : Props ) => {
                             aria-label="Close"
                         ></button>
                     </div>
-                    <div className="toast-body">Touched: | Sensor {toast.touchId} | Diff: {Math.round(toast.percentDiff*100)/100}% |</div>
+                    <div className="toast-body">Sensor {toast.touchId} | Diff: {Math.round(toast.percentDiff*100)/100}% </div>
                 </div>
             ))}
 

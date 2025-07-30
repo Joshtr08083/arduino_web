@@ -17,7 +17,7 @@ function App() {
 		leafStates,
 		onReconnect,
 		modalType,
-		showModal,
+		modalVisible,
 		toasts,
 		onToastClose,
 	} = websocketController();
@@ -48,7 +48,7 @@ function App() {
 
 				<AlertModal
 					type={modalType}
-					show={showModal.current}
+					show={modalVisible}
 					onReconnect={onReconnect}
 				/>
 			</div>

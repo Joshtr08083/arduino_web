@@ -55,7 +55,9 @@ const leafToMaterialMap: Record<LeafId, MaterialKey> = {
   Leaf4: 'leaf4'
 }
 
-const LOW_THRESHOLD = 50;
+const PERCENT_LOW_THRESHOLD = 10;
+
+const POS = {x: 0, y: -0.1, z: 0}
 
 export function Plant( { leafStates } : { leafStates: leafProps}) {
   const { nodes, materials } = useGLTF('/plant.gltf') as unknown as GLTFResult
@@ -63,7 +65,7 @@ export function Plant( { leafStates } : { leafStates: leafProps}) {
   useEffect(() => {
     for (const leaf in leafStates) {
       
-      const level = leafStates[leaf as keyof leafProps]  * 1000;
+      const level = leafStates[leaf as keyof leafProps];
       
       
       // console.log((level));
@@ -72,7 +74,7 @@ export function Plant( { leafStates } : { leafStates: leafProps}) {
       const color = new THREE.Color().lerpColors(
         new THREE.Color('#4AC74C'),
         new THREE.Color('#99D9FF'), 
-        (level < LOW_THRESHOLD? 0 : (level / 5))               
+        (level <= PERCENT_LOW_THRESHOLD? 0 : (level / 5))               
       )
       
       
@@ -82,11 +84,11 @@ export function Plant( { leafStates } : { leafStates: leafProps}) {
 
   return (
     <group dispose={null}>
-      <mesh geometry={nodes.Leaf3.geometry} material={materials.leaf3} position={[0.095, 0.799, -0.127]} rotation={[0, -0.49, 0]} />
-      <mesh geometry={nodes.Leaf2.geometry} material={materials.leaf2} position={[-0.094, 0.696, -0.127]} rotation={[0, 0.522, 0]} scale={0.774} />
-      <mesh geometry={nodes.Leaf4.geometry} material={materials.leaf4} position={[0.077, 0.799, 0.069]} rotation={[Math.PI, -1.098, Math.PI]} />
-      <mesh geometry={nodes.Leaf1.geometry} material={materials.leaf1} position={[0.057, 0.651, 0.029]} rotation={[-Math.PI, 1.198, -Math.PI]} />
-      <group position={[-0.025, 0.226, 0]} scale={0.424}>
+      <mesh geometry={nodes.Leaf3.geometry} material={materials.leaf3} position={[0.095+POS.x, 0.799+POS.y, -0.127+POS.z]} rotation={[0, -0.49, 0]} />
+      <mesh geometry={nodes.Leaf2.geometry} material={materials.leaf2} position={[-0.094+POS.x, 0.696+POS.y, -0.127+POS.z]} rotation={[0, 0.522, 0]} scale={0.774} />
+      <mesh geometry={nodes.Leaf4.geometry} material={materials.leaf4} position={[0.077+POS.x, 0.799+POS.y, 0.069+POS.z]} rotation={[Math.PI, -1.098, Math.PI]} />
+      <mesh geometry={nodes.Leaf1.geometry} material={materials.leaf1} position={[0.057+POS.x, 0.651+POS.y, 0.029+POS.z]} rotation={[-Math.PI, 1.198, -Math.PI]} />
+      <group position={[-0.025+POS.x, 0.226+POS.y, 0+POS.z]} scale={0.424}>
         <mesh geometry={nodes.Pot_1.geometry} material={materials.FlowerPot} />
         <mesh geometry={nodes.Pot_2.geometry} material={materials.Soil} />
       </group>

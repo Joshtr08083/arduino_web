@@ -5,6 +5,7 @@ type Action =
 	| { type: "PUSH"; payload: Toast }
 	| { type: "SHIFT" }
 	| { type: "DELETE"; target: number };
+
 function manageToasts(state: Toast[], action: Action): Toast[] {
 	switch (action.type) {
 		case "PUSH":
@@ -28,7 +29,7 @@ function manageToasts(state: Toast[], action: Action): Toast[] {
 }
 
 export function websocketController() {
-	const showModal = useRef(false);
+	const [modalVisible, setModalVisibility] = useState(false);
 	const [modalType, setModalType] = useState("");
 	const [toasts, setToasts] = useReducer(manageToasts, [
 		{ touchId: 0, percentDiff: 1, key: "" },
@@ -56,11 +57,22 @@ export function websocketController() {
 		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 	];
 	let dataAverages = [0, 0, 0, 0];
-	let diffPercents = [0, 0, 0, 0];
+	let leafShadePercents = [0, 0, 0, 0];
+	const TOUCH_THRESHOLD = {low: 0.0, mid: 0.02, high: 0.1};
 
 
-	const WS_URL = "ws://127.0.0.1:8080";
-	const socketClose = useRef(false);
+	const touched = useRef([
+		{ touched: false, releaseTime: 0 },
+		{ touched: false, releaseTime: 0 },
+		{ touched: false, releaseTime: 0 },
+		{ touched: false, releaseTime: 0 },
+	]);
+	// dont know what to name this but its how long finger must be released for touched to change back to false
+	const RELEASE_DEBOUNCE = 100;
+
+	// const WS_URL = `${window.location.origin}/ws/`;
+	const WS_URL = 'ws://127.0.0.1:8080'
+	const socketCloseIntentional = useRef(false);
 	const lastReconnect = useRef(0);
 	const [reconnect, setReconnect] = useState(0);
 	const RECONNECT_DELAY = 1000;
@@ -78,30 +90,31 @@ export function websocketController() {
 		const socket = new WebSocket(WS_URL);
 
 		socket.addEventListener("open", () => {
-			if (showModal.current && modalType === "SERVER_ERROR")
-				showModal.current = false;
+			setModalVisibility(false);
 
 			socket.send('{"id":"a","auth":"a"}');
-			socketClose.current = false;
+			socketCloseIntentional.current = false;
 		});
 		socket.addEventListener("close", () => {
-			if (
-				!socketClose.current &&
-				(!showModal.current || modalType === "ESP32_ERROR")
-			) {
+			if (!socketCloseIntentional.current) {
 				setModalType("SERVER_ERROR");
-				showModal.current = true;
+				setModalVisibility(true);
 			}
 		});
 		socket.addEventListener("message", async (event) => {
 			if (event.data) {
 				if (event.data.text) {
-					if (showModal.current) showModal.current = false;
+					setModalVisibility(false);
 
 					const dataText = await event.data.text();
 					const dataJSON = JSON.parse(dataText);
 
 					for (let i = 0; i < 4; i++) {
+						// TO-DO remove this line once you fix touch3
+						if (i === 2) {
+							continue;
+						}
+
 						let newData = dataJSON[`touch${i + 1}`];
 
 						if (dataBuffer[i][0] === -1) {
@@ -112,9 +125,17 @@ export function websocketController() {
 								(newData - dataAverages[i]) /
 									(dataAverages[i] != 0 ? dataAverages[i] : 1)
 							);
-							diffPercents[i] = diffPercent;
 
-							if (diffPercent < 0.03) {
+							const touchedState = touched.current[i];
+
+							if (diffPercent < TOUCH_THRESHOLD.mid ) {
+
+								if (touchedState.touched) {
+									touchedState.touched = false;
+									touchedState.releaseTime = Date.now();
+								}
+
+
 								dataBuffer[i].shift();
 								dataBuffer[i].push(newData);
 								const count = dataBuffer[i].reduce(
@@ -123,30 +144,45 @@ export function websocketController() {
 								);
 
 								dataAverages[i] = count / 15;
-							} else {
-								// TO-DO: fix toasts/data processing/sensors
-								// setToasts({
-								// 	type: "PUSH",
-								// 	payload: {
-								// 		touchId: i + 1,
-								// 		percentDiff: diffPercent,
-								// 		key: `${i + 1}-${diffPercent.toFixed(6)}-${Math.random()}`,
-								// 	},
-								// });
-								// const id = toasts.length;
 
-								// setTimeout(() => {
-								// 	onToastClose(id);
-								// }, 5000);
+								leafShadePercents[i] = 0;
+
+							} else {
+								if ( Date.now() < touchedState.releaseTime + RELEASE_DEBOUNCE ) {
+									touchedState.touched = true;
+								}
+								
+								if (!touchedState.touched) {
+									touchedState.touched = true;
+									setToasts({
+										type: "PUSH",
+										payload: {
+											touchId: i + 1,
+											percentDiff: diffPercent,
+											key: `${i + 1}-${diffPercent.toFixed(
+												6
+											)}-${Math.random()}`,
+										},
+									});
+									const id = toasts.length;
+	
+									setTimeout(() => {
+										onToastClose(id);
+									}, 5000);
+								}
+
+								leafShadePercents[i] = (diffPercent - TOUCH_THRESHOLD.low)/(TOUCH_THRESHOLD.high - TOUCH_THRESHOLD.low)*100;
 							}
+
+							
 						}
 					}
 
 					setLeafStates({
-						Leaf1: diffPercents[0],
-						Leaf2: diffPercents[1],
-						Leaf3: diffPercents[2],
-						Leaf4: diffPercents[3],
+						Leaf1: leafShadePercents[0],
+						Leaf2: leafShadePercents[1],
+						Leaf3: leafShadePercents[2],
+						Leaf4: leafShadePercents[3],
 					});
 
 					setData([
@@ -156,20 +192,11 @@ export function websocketController() {
 						{ reading: dataJSON.touch4, avg: Math.round(dataAverages[3]) },
 					]);
 				} else if (event.data === "no esp :(") {
-					if (!showModal.current) {
-						setModalType("ESP32_ERROR");
-						showModal.current = true;
-					}
+					setModalType("ESP32_ERROR");
+					setModalVisibility(true);
 				}
 			}
 		});
-
-		return () => {
-			if (socket.readyState) {
-				socketClose.current = true;
-				socket.close();
-			}
-		};
 	}, [reconnect]);
 
 	useEffect(() => {
@@ -181,7 +208,7 @@ export function websocketController() {
 		leafStates,
 		onReconnect,
 		modalType,
-		showModal,
+		modalVisible,
 		toasts,
 		onToastClose,
 	};
