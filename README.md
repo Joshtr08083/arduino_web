@@ -23,6 +23,6 @@ This is a *very* specific use-case and isn't useful outside of that use-case. Ar
 - Pull from `joshtr083/arduino-web:backend` and `joshtr083/arduino-web:frontend`
 - Copy docker-compose.yml
 - Edit `docker-compose-template.yml`:
-    - Frontend port: `- LISTEN_IP:PORT:8080`
+    - Frontend port: `LISTEN_IP:PORT:8080`
         - This will control how your frontend is accessed.
         - Access backend via /api and /ws
